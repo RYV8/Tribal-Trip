@@ -23,6 +23,8 @@
 .profile-button,
 .nav-item,
 .category-tile,
+.country-card,
+.route-card,
 .card-main,
 .story-row,
 .artifact-card button,
@@ -154,13 +156,28 @@ main {
   display: flex;
   align-items: flex-end;
   border-radius: 28px;
-  background:
-    linear-gradient(90deg, rgba(31, 31, 31, 0.76), rgba(31, 31, 31, 0.4) 52%, rgba(31, 31, 31, 0.12)),
-    url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Abomey_2006_1.jpg/1280px-Abomey_2006_1.jpg') center/cover;
+  background: #4f504c;
   box-shadow: var(--shadow);
 }
 
+.hero-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(31, 31, 31, 0.78), rgba(31, 31, 31, 0.42) 52%, rgba(31, 31, 31, 0.1));
+}
+
+.hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .hero-content {
+  position: relative;
+  z-index: 1;
   width: min(680px, 100%);
   padding: clamp(34px, 6vw, 72px);
   color: white;
@@ -179,6 +196,26 @@ main {
 
 .hero-panel .eyebrow {
   color: #f4d278;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  width: min(620px, 100%);
+  margin-top: 24px;
+}
+
+.hero-metrics .metric {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+}
+
+.hero-metrics .metric strong,
+.hero-metrics .metric span {
+  color: white;
 }
 
 h1,
@@ -250,6 +287,34 @@ h3 {
 
 .section-block {
   margin-top: 42px;
+}
+
+.museum-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fffdf8;
+  box-shadow: var(--soft-shadow);
+}
+
+.museum-note > svg {
+  color: var(--terracotta);
+}
+
+.museum-note h2 {
+  margin-top: 6px;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+}
+
+.museum-note p {
+  max-width: 760px;
+  margin-top: 8px;
+  color: var(--muted);
+  line-height: 1.65;
 }
 
 .section-heading span,
@@ -352,6 +417,90 @@ h3 {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+}
+
+.country-grid,
+.route-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.route-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.country-card,
+.route-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--ink);
+  background: var(--surface);
+  text-align: left;
+  box-shadow: var(--soft-shadow);
+  cursor: pointer;
+}
+
+.country-card {
+  display: grid;
+  min-height: 270px;
+  align-content: start;
+  padding: 10px;
+}
+
+.country-card img,
+.route-card img {
+  width: 100%;
+  height: 128px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.country-card span,
+.route-card span {
+  display: block;
+  margin-top: 12px;
+  color: var(--terracotta);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.country-card strong,
+.route-card strong {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+.country-card p,
+.route-card p {
+  display: -webkit-box;
+  margin-top: 8px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.route-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 330px;
+  padding: 10px;
+}
+
+.route-card img {
+  height: 160px;
+}
+
+.route-card div {
+  padding: 0 4px 8px;
 }
 
 .card-list,
@@ -498,7 +647,7 @@ h3 {
 
 .filter-panel {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 260px));
+  grid-template-columns: repeat(3, minmax(0, 260px));
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -524,6 +673,30 @@ h3 {
 
 .result-count {
   margin: 10px 0 16px;
+}
+
+.theme-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.theme-strip button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--surface);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.theme-strip button.active {
+  border-color: rgba(183, 90, 57, 0.24);
+  color: var(--terracotta);
+  background: var(--terracotta-soft);
 }
 
 .detail-screen {
@@ -641,6 +814,81 @@ h3 {
 
 .content-section p {
   margin-top: 10px;
+}
+
+.detail-body .content-section {
+  max-width: 780px;
+}
+
+.detail-body .content-section p {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.key-point-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.key-point-list p {
+  position: relative;
+  margin: 0;
+  padding: 14px 16px 14px 42px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.key-point-list p::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 18px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.museum-label {
+  max-width: 780px;
+  margin-top: 28px;
+  padding: 20px;
+  border: 1px solid rgba(36, 59, 83, 0.18);
+  border-left: 5px solid #243b53;
+  border-radius: 18px;
+  background: #f7faf9;
+}
+
+.museum-label > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #243b53;
+}
+
+.museum-label h2 {
+  font-size: 1.18rem;
+}
+
+.museum-label dl {
+  display: grid;
+  gap: 14px;
+  margin: 16px 0 0;
+}
+
+.museum-label dt {
+  color: var(--terracotta);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.museum-label dd {
+  margin: 4px 0 0;
+  color: var(--ink);
+  line-height: 1.6;
 }
 
 .tag-list {
@@ -866,7 +1114,9 @@ h3 {
 
   .category-grid,
   .artifact-grid,
-  .horizontal-list {
+  .horizontal-list,
+  .country-grid,
+  .route-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -892,6 +1142,10 @@ h3 {
 
   .timeline,
   .mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -977,9 +1231,10 @@ h3 {
     min-height: 440px;
     align-items: flex-end;
     border-radius: 0 0 28px 28px;
-    background:
-      linear-gradient(180deg, rgba(31, 31, 31, 0.1), rgba(31, 31, 31, 0.72)),
-      url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Abomey_2006_1.jpg/1280px-Abomey_2006_1.jpg') center/cover;
+  }
+
+  .hero-panel::after {
+    background: linear-gradient(180deg, rgba(31, 31, 31, 0.12), rgba(31, 31, 31, 0.76));
   }
 
   .hero-content {
@@ -995,6 +1250,20 @@ h3 {
     font-size: 1rem;
   }
 
+  .hero-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 18px;
+  }
+
+  .hero-metrics .metric {
+    padding: 12px;
+  }
+
+  .museum-note {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
   .section-block {
     margin-top: 28px;
   }
@@ -1002,6 +1271,27 @@ h3 {
   .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+  }
+
+  .country-grid,
+  .route-grid {
+    grid-auto-columns: minmax(260px, 82%);
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .country-grid > *,
+  .route-grid > * {
+    scroll-snap-align: start;
+  }
+
+  .country-card,
+  .route-card {
+    min-height: 292px;
   }
 
   .category-tile {
@@ -1078,6 +1368,16 @@ h3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .theme-strip {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .theme-strip button {
+    flex: 0 0 auto;
+  }
+
   .detail-hero {
     height: min(62vh, 520px);
     min-height: 360px;
@@ -1113,6 +1413,10 @@ h3 {
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .museum-label {
+    padding: 16px;
+  }
 }
 
 @media (max-width: 420px) {
@@ -1139,5 +1443,15 @@ h3 {
   .artifact-grid,
   .mini-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-metrics,
+  .metric-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .country-grid,
+  .route-grid {
+    grid-auto-columns: minmax(248px, 86%);
   }
 }

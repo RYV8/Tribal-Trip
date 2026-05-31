@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowLeft,
+  Archive,
   BookOpen,
   Building2,
   Clock,
@@ -40,11 +41,104 @@ const parentScreen = {
   artifactDetail: 'artifacts',
 }
 
+const countryProfiles = {
+  Benin: 'Dahomey palaces, Ouidah memory, Vodun context, and lake communities.',
+  Nigeria: 'Edo court art, Yoruba sacred landscapes, Nok archaeology, and Lagos museums.',
+  "Cote d'Ivoire": 'Grand-Bassam urban memory, Senufo art, clothing, and regional identity.',
+  Togo: 'Batammariba living architecture, national collections, and northern cultural landscapes.',
+  Ghana: 'Asante kingship, Akan gold knowledge, kente, and Atlantic memory sites.',
+  Kenya: 'Swahili coast cities, Indian Ocean routes, carved doors, and coastal architecture.',
+  Niger: 'Agadez, Tuareg craft, Sahelian cities, and trans-Saharan exchange.',
+  'Burkina Faso': 'Loropeni ruins, regional trade, music, Lobi figures, and living performance.',
+  Congo: 'Loango coastal memory, Kongo ritual objects, and regional museum heritage.',
+  Guinee: 'Fouta Djallon highlands, Baga masks, national collections, and landscape memory.',
+}
+
+const culturalRoutes = [
+  {
+    id: 'atlantic-memory-routes',
+    title: 'Atlantic Memory Route',
+    region: 'Benin · Nigeria · Ghana',
+    description: 'Ouidah, Badagry, and Cape Coast as connected sites of remembrance, diaspora, and historical literacy.',
+  },
+  {
+    id: 'swahili-coast',
+    title: 'Swahili Coast Route',
+    region: 'Kenya',
+    description: 'Fort Jesus and Lamu reveal Indian Ocean exchange, Swahili urban life, architecture, and maritime culture.',
+  },
+  {
+    id: 'akan-asante-heritage',
+    title: 'Akan and Asante Route',
+    region: 'Ghana',
+    description: 'Goldweights, kente, Manhyia Palace, and Cape Coast connect kingship, trade, symbols, and memory.',
+  },
+  {
+    id: 'trans-saharan-agadez',
+    title: 'Sahel Trade Route',
+    region: 'Niger',
+    description: 'Agadez links Tuareg craft, earthen architecture, Islam, caravans, and trans-Saharan history.',
+  },
+]
+
+const themeOptions = [
+  'All',
+  'Kingdoms',
+  'Sacred Sites',
+  'Atlantic Memory',
+  'Art & Objects',
+  'Living Traditions',
+  'Architecture',
+  'Trade Routes',
+]
+
+const themeKeywords = {
+  Kingdoms: ['kingdom', 'royal', 'palace', 'kingship', 'asante', 'dahomey', 'benin city', 'loango', 'edo'],
+  'Sacred Sites': ['sacred', 'ritual', 'spiritual', 'shrine', 'vodun', 'osun', 'ceremony'],
+  'Atlantic Memory': ['atlantic', 'memory', 'slave', 'coast', 'diaspora', 'forced migration', 'badagry', 'ouidah', 'cape coast'],
+  'Art & Objects': ['art', 'artifact', 'museum', 'bronze', 'mask', 'textile', 'goldweight', 'kente', 'craft', 'gallery'],
+  'Living Traditions': ['living', 'tradition', 'community', 'performance', 'music', 'festival', 'identity', 'ceremony'],
+  Architecture: ['architecture', 'earthen', 'town', 'urban', 'fort', 'house', 'door', 'built', 'landscape'],
+  'Trade Routes': ['trade', 'route', 'caravan', 'gold', 'saharan', 'indian ocean', 'commerce', 'exchange'],
+}
+
 const favoriteKey = 'tribal-tripe-favorites'
 
 const emptyFilters = {
   country: 'All',
   category: 'All',
+  theme: 'All',
+}
+
+const getStoryById = (id) => stories.find((story) => story.id === id)
+
+function locationMatchesTheme(location, theme) {
+  if (!theme || theme === 'All') return true
+  const relatedStoryText = (location.relatedStoryIds ?? [])
+    .map((id) => getStoryById(id))
+    .filter(Boolean)
+    .map((story) => [story.title, story.summary, story.country, story.category, story.keyPoints?.join(' ')].join(' '))
+    .join(' ')
+  const haystack = [location.name, location.type, location.country, location.city, location.summary, location.history, location.tags?.join(' '), relatedStoryText]
+    .join(' ')
+    .toLowerCase()
+
+  return themeKeywords[theme]?.some((keyword) => haystack.includes(keyword.toLowerCase())) ?? true
+}
+
+function getCountryStats(country) {
+  const countryLocations = locations.filter((location) => location.country === country)
+  const countryStories = stories.filter((story) => story.country.includes(country))
+  return {
+    locations: countryLocations.length,
+    stories: countryStories.length,
+    image: countryLocations[0]?.image,
+  }
+}
+
+function getWhyItMatters(story) {
+  if (story.keyPoints?.length) return story.keyPoints.join(' ')
+  return story.summary
 }
 
 function getStoredFavorites() {
@@ -256,12 +350,26 @@ function App() {
 }
 
 function HomeScreen({ openScreen, setFilters, setQuery }) {
-  const featured = locations.slice(0, 4)
-  const storyPicks = stories.slice(0, 3)
+  const featured = [
+    'grand-bassam-historic-town',
+    'koutammakou-cultural-landscape',
+    'cape-coast-castle',
+    'fort-jesus-mombasa',
+  ]
+    .map((id) => locations.find((location) => location.id === id))
+    .filter(Boolean)
+  const storyPicks = ['akan-asante-heritage', 'swahili-coast', 'trans-saharan-agadez']
+    .map((id) => stories.find((story) => story.id === id))
+    .filter(Boolean)
 
   const quickSearch = (country) => {
-    setFilters({ country, category: 'All' })
+    setFilters({ country, category: 'All', theme: 'All' })
     openScreen('discover')
+  }
+
+  const openRoute = (storyId) => {
+    const story = getStoryById(storyId)
+    if (story) openScreen('storyDetail', story)
   }
 
   const submitSearch = (event) => {
@@ -274,19 +382,37 @@ function HomeScreen({ openScreen, setFilters, setQuery }) {
   return (
     <section className="screen home-screen">
       <div className="hero-panel">
+        <img className="hero-media" src="/hero-grand-bassam.jpg" alt="" />
         <div className="hero-content">
-          <span className="eyebrow">Benin and Nigeria MVP</span>
+          <span className="eyebrow">{countries.length} countries MVP</span>
           <h1>Discover Africa's Cultural Heritage</h1>
           <p>
-            Find museums, heritage sites, stories, and artifacts through a focused responsive discovery experience.
+            Explore museums, heritage sites, cultural routes, and artifacts through a digital museum built for learning.
           </p>
           <form className="search-form" onSubmit={submitSearch}>
             <Search size={18} />
             <input name="home-search" placeholder="Search museums, stories, artifacts" />
             <button type="submit">Search</button>
           </form>
+          <div className="hero-metrics" aria-label="Catalogue summary">
+            <Metric label="Countries" value={countries.length} />
+            <Metric label="Places" value={locations.length} />
+            <Metric label="Stories" value={stories.length} />
+            <Metric label="Artifacts" value={artifacts.length} />
+          </div>
         </div>
       </div>
+
+      <section className="section-block museum-note">
+        <Archive size={22} />
+        <div>
+          <span className="eyebrow">Digital museum atlas</span>
+          <h2>Culture explained through places, objects, and context</h2>
+          <p>
+            Tribal Tripe treats heritage as knowledge: every route connects a place, a story, and an object so users can learn before they visit.
+          </p>
+        </div>
+      </section>
 
       <section className="section-block">
         <div className="section-heading">
@@ -304,13 +430,31 @@ function HomeScreen({ openScreen, setFilters, setQuery }) {
       <section className="section-block compact-band">
         <div>
           <span className="eyebrow">Countries</span>
-          <h2>Explore the launch markets</h2>
+          <h2>Explore the launch countries</h2>
         </div>
         <div className="country-actions">
           {countries.map((country) => (
             <button key={country} type="button" onClick={() => quickSearch(country)}>
               {country}
             </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-block">
+        <SectionTitle title="Country atlas" action="Open discover" onAction={() => openScreen('discover')} />
+        <div className="country-grid">
+          {countries.map((country) => (
+            <CountryCard key={country} country={country} onClick={() => quickSearch(country)} />
+          ))}
+        </div>
+      </section>
+
+      <section className="section-block">
+        <SectionTitle title="Curated cultural routes" action="Read stories" onAction={() => openScreen('stories')} />
+        <div className="route-grid">
+          {culturalRoutes.map((route) => (
+            <RouteCard key={route.id} route={route} onClick={() => openRoute(route.id)} />
           ))}
         </div>
       </section>
@@ -340,7 +484,8 @@ function DiscoverScreen({ filters, setFilters, openScreen, favoriteIds, toggleFa
   const filteredLocations = locations.filter((location) => {
     const countryMatch = filters.country === 'All' || location.country === filters.country
     const categoryMatch = filters.category === 'All' || location.type === filters.category
-    return countryMatch && categoryMatch
+    const themeMatch = locationMatchesTheme(location, filters.theme)
+    return countryMatch && categoryMatch && themeMatch
   })
 
   return (
@@ -348,7 +493,7 @@ function DiscoverScreen({ filters, setFilters, openScreen, favoriteIds, toggleFa
       <PageIntro
         eyebrow="Discover"
         title="Museums, heritage sites, and cultural centers"
-        text="Filter the first MVP catalogue by country and cultural category."
+        text={`Filter the first MVP catalogue across ${countries.length} African countries by country and cultural category.`}
       />
       <div className="filter-panel">
         <SelectFilter
@@ -363,6 +508,24 @@ function DiscoverScreen({ filters, setFilters, openScreen, favoriteIds, toggleFa
           options={['All', ...categories]}
           onChange={(category) => setFilters((current) => ({ ...current, category }))}
         />
+        <SelectFilter
+          label="Theme"
+          value={filters.theme}
+          options={themeOptions}
+          onChange={(theme) => setFilters((current) => ({ ...current, theme }))}
+        />
+      </div>
+      <div className="theme-strip" aria-label="Theme shortcuts">
+        {themeOptions.map((theme) => (
+          <button
+            className={filters.theme === theme ? 'active' : ''}
+            key={theme}
+            type="button"
+            onClick={() => setFilters((current) => ({ ...current, theme }))}
+          >
+            {theme}
+          </button>
+        ))}
       </div>
       <div className="result-count">{filteredLocations.length} places found</div>
       <div className="card-list">
@@ -408,6 +571,14 @@ function LocationDetail({ location, goBack, openScreen, isFavorite, toggleFavori
 
       <ContentSection title="Overview" text={location.summary} />
       <ContentSection title="Historical context" text={location.history} />
+      <MuseumLabel
+        title="Visit lens"
+        items={[
+          { label: 'Look for', value: location.tags.join(', ') },
+          { label: 'Learning focus', value: relatedStories[0]?.summary ?? location.summary },
+          { label: 'Museum note', value: 'Use this place as a starting point, then follow the related story and artifact links for context.' },
+        ]}
+      />
       <TagList tags={location.tags} />
 
       <RelatedSection title="Related stories">
@@ -463,6 +634,17 @@ function StoryDetail({ story, goBack, openScreen, isFavorite, toggleFavorite }) 
         </button>
       </div>
       <ContentSection title="Story" text={story.body} />
+      {story.keyPoints && (
+        <section className="content-section">
+          <h2>Key points</h2>
+          <div className="key-point-list">
+            {story.keyPoints.map((point) => (
+              <p key={point}>{point}</p>
+            ))}
+          </div>
+        </section>
+      )}
+      <ContentSection title="Why it matters" text={getWhyItMatters(story)} />
       <section className="content-section">
         <h2>Timeline</h2>
         <div className="timeline">
@@ -498,7 +680,7 @@ function ArtifactsScreen({ openScreen, favoriteIds, toggleFavorite }) {
       <PageIntro
         eyebrow="Explore"
         title="Artifact gallery"
-        text="A starter catalogue that links objects back to stories and museums."
+        text="A starter catalogue that links objects back to stories, museums, and heritage places."
       />
       <div className="artifact-grid">
         {artifacts.map((artifact) => (
@@ -536,6 +718,14 @@ function ArtifactDetail({ artifact, goBack, openScreen, isFavorite, toggleFavori
       />
       <ContentSection title="Description" text={artifact.summary} />
       <ContentSection title="Cultural significance" text={artifact.significance} />
+      <MuseumLabel
+        title="Museum label"
+        items={[
+          { label: 'Object', value: artifact.name },
+          { label: 'Context', value: artifact.origin },
+          { label: 'Interpretation', value: artifact.significance },
+        ]}
+      />
       {relatedLocation && (
         <RelatedSection title="Related museum or site">
           <LocationCard location={relatedLocation} openScreen={openScreen} compact />
@@ -563,7 +753,15 @@ function SearchScreen({ query, setQuery, openScreen, favoriteIds, toggleFavorite
 
   const results = normalized
     ? searchable.filter((item) =>
-        [item.title, item.subtitle, item.country, item.summary]
+        [
+          item.title,
+          item.subtitle,
+          item.country,
+          item.summary,
+          Array.isArray(item.body) ? item.body.join(' ') : item.body,
+          item.significance,
+          item.origin,
+        ]
           .join(' ')
           .toLowerCase()
           .includes(normalized),
@@ -579,7 +777,7 @@ function SearchScreen({ query, setQuery, openScreen, favoriteIds, toggleFavorite
       />
       <label className="global-search">
         <Search size={19} />
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Try Dahomey, Lagos, Yoruba, bronze" autoFocus />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Try Ghana, Lamu, Agadez, bronze" autoFocus />
       </label>
       <div className="result-count">{results.length} results</div>
       <div className="search-results">
@@ -646,11 +844,11 @@ function ProfileScreen({ openScreen }) {
         <div className="profile-avatar">TT</div>
         <div>
           <h2>Guest explorer</h2>
-          <p>Local favorites enabled. Benin and Nigeria catalogue active.</p>
+          <p>Local favorites enabled. {countries.length}-country catalogue active.</p>
         </div>
       </div>
       <div className="metric-grid">
-        <Metric label="Launch countries" value="2" />
+        <Metric label="Launch countries" value={countries.length} />
         <Metric label="Locations" value={locations.length} />
         <Metric label="Stories" value={stories.length} />
         <Metric label="Artifacts" value={artifacts.length} />
@@ -670,6 +868,53 @@ function CategoryTile({ icon: Icon, title, text, onClick }) {
       <strong>{title}</strong>
       <span>{text}</span>
     </button>
+  )
+}
+
+function CountryCard({ country, onClick }) {
+  const stats = getCountryStats(country)
+
+  return (
+    <button className="country-card" type="button" onClick={onClick}>
+      {stats.image && <img src={stats.image} alt="" />}
+      <span>{stats.locations} places · {stats.stories} stories</span>
+      <strong>{country}</strong>
+      <p>{countryProfiles[country]}</p>
+    </button>
+  )
+}
+
+function RouteCard({ route, onClick }) {
+  const story = getStoryById(route.id)
+
+  return (
+    <button className="route-card" type="button" onClick={onClick}>
+      <img src={story?.image} alt="" />
+      <div>
+        <span>{route.region}</span>
+        <strong>{route.title}</strong>
+        <p>{route.description}</p>
+      </div>
+    </button>
+  )
+}
+
+function MuseumLabel({ title, items }) {
+  return (
+    <section className="museum-label">
+      <div>
+        <Archive size={20} />
+        <h2>{title}</h2>
+      </div>
+      <dl>
+        {items.map((item) => (
+          <div key={item.label}>
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   )
 }
 
@@ -811,10 +1056,14 @@ function InfoGrid({ items }) {
 }
 
 function ContentSection({ title, text }) {
+  const paragraphs = Array.isArray(text) ? text : [text]
+
   return (
     <section className="content-section">
       <h2>{title}</h2>
-      <p>{text}</p>
+      {paragraphs.map((paragraph) => (
+        <p key={paragraph}>{paragraph}</p>
+      ))}
     </section>
   )
 }

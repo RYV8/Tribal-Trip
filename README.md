@@ -1,10 +1,11 @@
 # Tribal Tripe MVP
 
-Mobile-first React MVP for discovering African cultural heritage in Benin and Nigeria.
+Web-first responsive React MVP for discovering African cultural heritage across 10 African countries.
 
 ## MVP Scope
 
 - Discover museums, heritage sites, and cultural centers.
+- Explore country atlas cards and curated cultural routes.
 - Read short cultural stories with timelines.
 - Explore a starter artifact gallery.
 - Search across locations, stories, and artifacts.
@@ -17,6 +18,7 @@ Mobile-first React MVP for discovering African cultural heritage in Benin and Ni
 - Vite
 - Lucide React icons
 - Local JavaScript data in `src/data/content.js`
+- Local hero asset in `public/hero-grand-bassam.jpg`
 
 ## Run Locally
 
