@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:wght@700;900&display=swap');
+
+:root {
+  --terracotta: #b75a39;
+  --terracotta-soft: rgba(183, 90, 57, 0.12);
+  --gold: #d4a017;
+  --green: #2d6a4f;
+  --paper: #f8f5f0;
+  --surface: #fffdf8;
+  --ink: #1f1f1f;
+  --muted: #6f665f;
+  --line: rgba(31, 31, 31, 0.12);
+  --shadow: 0 24px 70px rgba(31, 31, 31, 0.16);
+  --soft-shadow: 0 14px 34px rgba(31, 31, 31, 0.07);
+  --sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --serif: 'Merriweather', Georgia, serif;
+
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100svh;
+  margin: 0;
+  background: var(--paper);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100svh;
+}
