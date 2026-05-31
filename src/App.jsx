@@ -10,9 +10,11 @@ import {
   Home,
   Landmark,
   MapPin,
+  Moon,
   Route,
   Search,
   Sparkles,
+  Sun,
   User,
 } from 'lucide-react'
 import './App.css'
@@ -103,6 +105,7 @@ const themeKeywords = {
 }
 
 const favoriteKey = 'tribal-tripe-favorites'
+const themeKey = 'tribal-tripe-theme'
 
 const emptyFilters = {
   country: 'All',
@@ -149,12 +152,39 @@ function getStoredFavorites() {
   }
 }
 
+function getStoredTheme() {
+  try {
+    const storedTheme = localStorage.getItem(themeKey)
+    if (storedTheme === 'light' || storedTheme === 'dark') return storedTheme
+  } catch {
+    return 'light'
+  }
+
+  if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark'
+
+  return 'light'
+}
+
 function App() {
   const [screen, setScreen] = useState('home')
   const [selected, setSelected] = useState(null)
   const [filters, setFilters] = useState(emptyFilters)
   const [query, setQuery] = useState('')
   const [favorites, setFavorites] = useState(getStoredFavorites)
+  const [theme, setTheme] = useState(getStoredTheme)
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+
+    const favicon = document.querySelector("link[rel='icon']")
+    if (favicon) {
+      favicon.href = theme === 'dark' ? '/logo-mark-dark.png' : '/logo-mark-light.png'
+      favicon.type = 'image/png'
+    }
+
+    localStorage.setItem(themeKey, theme)
+  }, [theme])
 
   useEffect(() => {
     localStorage.setItem(favoriteKey, JSON.stringify(favorites))
@@ -192,6 +222,13 @@ function App() {
   }
 
   const activeScreen = parentScreen[screen] ?? screen
+  const logoMark = theme === 'dark' ? '/logo-mark-dark.png' : '/logo-mark-light.png'
+  const logoFull = theme === 'dark' ? '/logo-dark.jpeg' : '/logo-light.jpeg'
+  const themeToggleLabel = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))
+  }
 
   const renderScreen = () => {
     if (screen === 'discover') {
@@ -279,7 +316,7 @@ function App() {
     }
 
     if (screen === 'profile') {
-      return <ProfileScreen openScreen={openScreen} />
+      return <ProfileScreen openScreen={openScreen} logoFull={logoFull} />
     }
 
     return <HomeScreen openScreen={openScreen} setFilters={setFilters} setQuery={setQuery} />
@@ -302,7 +339,7 @@ function App() {
     <div className="app-shell">
       <header className="topbar">
         <button className="brand" type="button" onClick={() => openScreen('home')}>
-          <span className="brand-mark">TT</span>
+          <img className="brand-logo" src={logoMark} alt="" aria-hidden="true" />
           <span>
             <strong>Tribal Tripe</strong>
             <small>Modern African Heritage</small>
@@ -320,10 +357,16 @@ function App() {
             </button>
           ))}
         </nav>
-        <button className="profile-button" type="button" aria-label="Open profile" onClick={() => openScreen('profile')}>
-          <User size={18} />
-          <span>Profile</span>
-        </button>
+        <div className="topbar-actions">
+          <button className="theme-toggle" type="button" aria-label={themeToggleLabel} title={themeToggleLabel} onClick={toggleTheme}>
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          </button>
+          <button className="profile-button" type="button" aria-label="Open profile" onClick={() => openScreen('profile')}>
+            <User size={18} />
+            <span>Profile</span>
+          </button>
+        </div>
       </header>
 
       <main>{renderScreen()}</main>
@@ -832,7 +875,7 @@ function SavedScreen({ favorites, openScreen, clearSaved }) {
   )
 }
 
-function ProfileScreen({ openScreen }) {
+function ProfileScreen({ openScreen, logoFull }) {
   return (
     <section className="screen">
       <PageIntro
@@ -841,7 +884,7 @@ function ProfileScreen({ openScreen }) {
         text="The first version keeps discovery open. Accounts can come later when backend and content administration are ready."
       />
       <div className="profile-panel">
-        <div className="profile-avatar">TT</div>
+        <img className="profile-logo-full" src={logoFull} alt="Tribal Tripe logo" />
         <div>
           <h2>Guest explorer</h2>
           <p>Local favorites enabled. {countries.length}-country catalogue active.</p>

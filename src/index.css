@@ -1,15 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:wght@700;900&display=swap');
 
 :root {
+  color-scheme: light;
   --terracotta: #b75a39;
   --terracotta-soft: rgba(183, 90, 57, 0.12);
+  --terracotta-line: rgba(183, 90, 57, 0.24);
   --gold: #d4a017;
+  --gold-soft: rgba(212, 160, 23, 0.16);
   --green: #2d6a4f;
+  --green-soft: rgba(45, 106, 79, 0.11);
   --paper: #f8f5f0;
   --surface: #fffdf8;
+  --surface-strong: #ffffff;
+  --surface-warm: #fffaf0;
+  --surface-tint: #f7faf9;
   --ink: #1f1f1f;
   --muted: #6f665f;
   --line: rgba(31, 31, 31, 0.12);
+  --topbar-bg: rgba(248, 245, 240, 0.92);
+  --nav-bg: rgba(255, 255, 255, 0.94);
+  --control-bg: rgba(255, 255, 255, 0.72);
+  --control-strong-bg: rgba(255, 255, 255, 0.92);
+  --search-bg: rgba(255, 255, 255, 0.96);
+  --hero-bg: #4f504c;
+  --hero-overlay: linear-gradient(90deg, rgba(31, 31, 31, 0.78), rgba(31, 31, 31, 0.42) 52%, rgba(31, 31, 31, 0.1));
+  --hero-overlay-mobile: linear-gradient(180deg, rgba(31, 31, 31, 0.12), rgba(31, 31, 31, 0.76));
+  --hero-text: #fffdf8;
+  --hero-muted: rgba(255, 255, 255, 0.9);
+  --hero-eyebrow: #f4d278;
+  --hero-metric-bg: rgba(255, 255, 255, 0.14);
+  --hero-metric-border: rgba(255, 255, 255, 0.24);
+  --museum-label-bg: #f7faf9;
+  --museum-label-line: rgba(36, 59, 83, 0.18);
+  --museum-label-accent: #243b53;
+  --action-ink: #fffdf8;
   --shadow: 0 24px 70px rgba(31, 31, 31, 0.16);
   --soft-shadow: 0 14px 34px rgba(31, 31, 31, 0.07);
   --sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -22,6 +46,44 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --terracotta: #d36a3c;
+  --terracotta-soft: rgba(211, 106, 60, 0.2);
+  --terracotta-line: rgba(211, 106, 60, 0.34);
+  --gold: #e4b34e;
+  --gold-soft: rgba(228, 179, 78, 0.18);
+  --green: #93b86c;
+  --green-soft: rgba(147, 184, 108, 0.16);
+  --paper: #151311;
+  --surface: #211d19;
+  --surface-strong: #2a241f;
+  --surface-warm: #261f18;
+  --surface-tint: #1d261f;
+  --ink: #f8f1e8;
+  --muted: #c8b9aa;
+  --line: rgba(234, 196, 117, 0.17);
+  --topbar-bg: rgba(21, 19, 17, 0.9);
+  --nav-bg: rgba(28, 24, 20, 0.94);
+  --control-bg: rgba(45, 38, 31, 0.84);
+  --control-strong-bg: rgba(54, 45, 36, 0.94);
+  --search-bg: rgba(38, 32, 27, 0.96);
+  --hero-bg: #11100f;
+  --hero-overlay: linear-gradient(90deg, rgba(13, 12, 11, 0.88), rgba(13, 12, 11, 0.58) 52%, rgba(13, 12, 11, 0.22));
+  --hero-overlay-mobile: linear-gradient(180deg, rgba(13, 12, 11, 0.18), rgba(13, 12, 11, 0.84));
+  --hero-text: #fff9ed;
+  --hero-muted: rgba(255, 247, 235, 0.84);
+  --hero-eyebrow: #f4ce74;
+  --hero-metric-bg: rgba(255, 231, 176, 0.12);
+  --hero-metric-border: rgba(255, 231, 176, 0.22);
+  --museum-label-bg: #1d231d;
+  --museum-label-line: rgba(228, 179, 78, 0.22);
+  --museum-label-accent: #e4b34e;
+  --action-ink: #fff9ed;
+  --shadow: 0 28px 78px rgba(0, 0, 0, 0.48);
+  --soft-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
 }
 
 * {
@@ -43,6 +105,11 @@ button,
 input,
 select {
   font: inherit;
+}
+
+input::placeholder {
+  color: var(--muted);
+  opacity: 0.86;
 }
 
 button,
