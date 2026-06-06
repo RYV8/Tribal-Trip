@@ -1,0 +1,38 @@
+{
+  "name": "tribe-trip-backend",
+  "version": "1.0.0",
+  "description": "Tribe Trip production-ready API foundation - Node.js + Express + Prisma",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "check": "find src scripts -name '*.js' -print0 | xargs -0 -n 1 node --check && prisma validate",
+    "test": "node scripts/run-tests.js",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "seed": "prisma generate && node scripts/seed-from-frontend.js",
+    "dev:admin": "node scripts/create-dev-admin.js",
+    "dev:editor": "node scripts/create-dev-editor.js",
+    "dev:super-admin": "node scripts/create-dev-super-admin.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-better-sqlite3": "6.19.3",
+    "@prisma/client": "6.19.3",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.10.0",
+    "cloudinary": "^2.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "prisma": "6.19.3"
+  }
+}

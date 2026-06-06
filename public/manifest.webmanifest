@@ -1,0 +1,24 @@
+{
+  "name": "Tribe Trip",
+  "short_name": "Tribe Trip",
+  "description": "A mobile-first African cultural discovery platform for museums, heritage sites, stories, food, and practical culture guides.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F8F5F0",
+  "theme_color": "#B75A39",
+  "icons": [
+    {
+      "src": "/logo-mark-light.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-mark-dark.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

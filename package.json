@@ -1,13 +1,23 @@
 {
-  "name": "tribal-tripe-mvp",
+  "name": "tribe-trip-mvp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:frontend": "vite",
+    "dev:backend": "npm --prefix backend run dev",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "quality": "npm run lint && npm run build && npm run check:backend && npm run test:backend",
+    "db:push": "npm --prefix backend run db:push",
+    "seed:backend": "npm --prefix backend run seed",
+    "check:backend": "npm --prefix backend run check",
+    "test:backend": "npm --prefix backend test",
+    "dev:admin": "npm --prefix backend run dev:admin",
+    "dev:editor": "npm --prefix backend run dev:editor",
+    "dev:super-admin": "npm --prefix backend run dev:super-admin"
   },
   "dependencies": {
     "lucide-react": "^1.17.0",

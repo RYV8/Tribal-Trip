@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark-light.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tribal Tripe</title>
+    <meta name="theme-color" content="#B75A39" />
+    <title>Tribe Trip</title>
+    <script src="/runtime-config.js"></script>
     <script>
       (() => {
         try {
-          const storedTheme = localStorage.getItem('tribal-tripe-theme')
+          const storedTheme = localStorage.getItem('tribe-trip-theme') || localStorage.getItem('tribal-tripe-theme')
           const theme = storedTheme === 'dark' || storedTheme === 'light'
             ? storedTheme
             : window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -25,5 +28,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js').catch(() => {})
+        })
+      }
+    </script>
   </body>
 </html>

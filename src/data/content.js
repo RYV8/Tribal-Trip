@@ -1,3 +1,5 @@
+const localHeritageImage = '/hero-grand-bassam.jpg'
+
 const image = {
   abomey:
     'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Abomey_2006_1.jpg/1280px-Abomey_2006_1.jpg',
@@ -87,6 +89,10 @@ const image = {
     'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Shoulder_mask_nimba_Louvre_MHNT-ETH-AF127.jpg/1280px-Shoulder_mask_nimba_Louvre_MHNT-ETH-AF127.jpg',
 }
 
+for (const key of Object.keys(image)) {
+  if (image[key].startsWith('http')) image[key] = localHeritageImage
+}
+
 export const locations = [
   {
     id: 'royal-palaces-abomey',
@@ -104,6 +110,13 @@ export const locations = [
     tags: ['UNESCO', 'Dahomey', 'Royal Heritage'],
     relatedStoryIds: ['dahomey-kingdom'],
     relatedArtifactIds: ['dahomey-royal-banner'],
+    sources: [
+      {
+        title: 'UNESCO World Heritage Centre - Royal Palaces of Abomey',
+        url: 'https://whc.unesco.org/en/list/323/',
+        note: 'Official heritage listing used for site context and conservation status.',
+      },
+    ],
   },
   {
     id: 'ouidah-history-museum',
@@ -534,14 +547,14 @@ export const locations = [
     id: 'national-museum-guinea',
     name: 'National Museum of Guinea',
     type: 'Museum',
-    country: 'Guinee',
+    country: 'Guinea',
     city: 'Conakry',
     image: image.guineaMuseum,
-    summary: 'A national museum for Guinee\'s material culture, masks, music, communities, and history.',
+    summary: 'A national museum for Guinea\'s material culture, masks, music, communities, and history.',
     history:
       'The National Museum of Guinea gives visitors an entry point into the country\'s cultural regions and artistic traditions. It is especially useful for connecting masks, music, initiation societies, and community history to a broader national story.',
     openingHours: 'Hours to confirm locally',
-    address: 'Conakry, Guinee',
+    address: 'Conakry, Guinea',
     coordinates: { lat: 9.5092, lng: -13.7122 },
     tags: ['Museum', 'Conakry', 'National Collection'],
     relatedStoryIds: ['guinea-highlands-and-baga'],
@@ -551,14 +564,14 @@ export const locations = [
     id: 'fouta-djallon',
     name: 'Fouta Djallon',
     type: 'Heritage Site',
-    country: 'Guinee',
-    city: 'Central Guinee',
+    country: 'Guinea',
+    city: 'Central Guinea',
     image: image.foutaDjallon,
     summary: 'A highland region central to Fulbe history, learning, landscape, water systems, and cultural identity.',
     history:
-      'Fouta Djallon is important because geography and culture are inseparable here. The highlands shaped settlement, Islamic scholarship, pastoral systems, political history, and river sources that matter far beyond Guinee.',
+      'Fouta Djallon is important because geography and culture are inseparable here. The highlands shaped settlement, Islamic scholarship, pastoral systems, political history, and river sources that matter far beyond Guinea.',
     openingHours: 'Regional landscape; guided visits recommended',
-    address: 'Fouta Djallon, Guinee',
+    address: 'Fouta Djallon, Guinea',
     coordinates: { lat: 11.3, lng: -12.3 },
     tags: ['Highlands', 'Fulbe History', 'Landscape'],
     relatedStoryIds: ['guinea-highlands-and-baga'],
@@ -592,6 +605,13 @@ export const stories = [
     ],
     relatedLocationIds: ['royal-palaces-abomey', 'ouidah-history-museum'],
     relatedArtifactIds: ['dahomey-royal-banner'],
+    sources: [
+      {
+        title: 'UNESCO World Heritage Centre - Royal Palaces of Abomey',
+        url: 'https://whc.unesco.org/en/list/323/',
+        note: 'Reference for Abomey as a material entry point into Dahomey history.',
+      },
+    ],
   },
   {
     id: 'benin-kingdom',
@@ -760,7 +780,7 @@ export const stories = [
     timeline: [
       { period: 'Workshops', text: 'Artists and educators bring craft and contemporary practice to new audiences.' },
       { period: 'Galleries', text: 'Public art spaces make discovery easier for local and visiting users.' },
-      { period: 'MVP', text: 'Tribal Tripe can connect exhibitions with deeper heritage context.' },
+      { period: 'MVP', text: 'Tribe Trip can connect exhibitions with deeper heritage context.' },
     ],
     body: [
       'A cultural discovery product should not stop at historic monuments. Contemporary art spaces show what artists, curators, educators, and communities are building now.',
@@ -959,24 +979,24 @@ export const stories = [
   },
   {
     id: 'guinea-highlands-and-baga',
-    title: 'Guinee Highlands and Baga Heritage',
+    title: 'Guinea Highlands and Baga Heritage',
     category: 'Tradition',
-    country: 'Guinee',
+    country: 'Guinea',
     image: image.foutaDjallon,
     summary: 'Fouta Djallon, Fulbe history, water landscapes, Baga masks, and national cultural memory.',
     readTime: '7 min read',
     timeline: [
       { period: 'Highland histories', text: 'Fouta Djallon shapes settlement, scholarship, pastoral life, and political memory.' },
       { period: 'Coastal cultures', text: 'Baga artistic traditions carry community knowledge and ceremonial meaning.' },
-      { period: 'Today', text: 'Museums and regional landscapes help connect Guinee\'s diverse cultural worlds.' },
+      { period: 'Today', text: 'Museums and regional landscapes help connect Guinea\'s diverse cultural worlds.' },
     ],
     body: [
-      'Guinee should not be treated as one cultural block. Fouta Djallon, coastal communities, forest regions, and urban Conakry all carry different histories. The MVP starts with two clear anchors: the highlands and Baga material culture.',
+      'Guinea should not be treated as one cultural block. Fouta Djallon, coastal communities, forest regions, and urban Conakry all carry different histories. The MVP starts with two clear anchors: the highlands and Baga material culture.',
       'Fouta Djallon matters because landscape and history are connected. The highlands shaped pastoral life, Islamic scholarship, political formations, and river systems that influence much of West Africa.',
       'The Baga Nimba mask is a strong artifact entry because it connects sculpture to ceremony, fertility, community identity, and performance. Like many masks, it should not be explained as a static object only; its meaning comes from use and context.',
     ],
     keyPoints: [
-      'Guinee heritage needs regional specificity.',
+      'Guinea heritage needs regional specificity.',
       'Fouta Djallon links geography, scholarship, pastoral life, and political memory.',
       'Baga masks must be connected to ceremony and community context.',
     ],
@@ -1050,6 +1070,13 @@ export const artifacts = [
       'Royal banners help users see that history can be encoded through cloth, color, symbols, and court storytelling.',
     relatedLocationId: 'royal-palaces-abomey',
     relatedStoryIds: ['dahomey-kingdom', 'atlantic-memory-routes'],
+    sources: [
+      {
+        title: 'The Metropolitan Museum of Art - Royal arts of Dahomey',
+        url: 'https://www.metmuseum.org/toah/hd/daho/hd_daho.htm',
+        note: 'Background reference for Dahomey court art and royal visual language.',
+      },
+    ],
   },
   {
     id: 'yoruba-beaded-crown',
@@ -1184,7 +1211,7 @@ export const artifacts = [
   {
     id: 'baga-nimba-mask',
     name: 'Baga Nimba Shoulder Mask',
-    country: 'Guinee',
+    country: 'Guinea',
     origin: 'Baga communities',
     period: '19th - 20th century traditions',
     image: image.bagaNimba,
@@ -1207,5 +1234,5 @@ export const countries = [
   'Niger',
   'Burkina Faso',
   'Congo',
-  'Guinee',
+  'Guinea',
 ]

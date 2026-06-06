@@ -1,0 +1,57 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: ${DATABASE_URL:-file:../data/prod.db}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET before starting the stack}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      RUN_SEED: ${RUN_SEED:-false}
+      FRONTEND_URLS: ${FRONTEND_URLS:-http://localhost:8080,http://127.0.0.1:8080}
+      TRUST_PROXY: 1
+      LOG_REQUESTS: ${LOG_REQUESTS:-true}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
+      RATE_LIMIT_API_MAX: ${RATE_LIMIT_API_MAX:-500}
+      RATE_LIMIT_AUTH_MAX: ${RATE_LIMIT_AUTH_MAX:-30}
+      RATE_LIMIT_LOCAL_SECRETS_MAX: ${RATE_LIMIT_LOCAL_SECRETS_MAX:-60}
+      MEDIA_STORAGE_PROVIDER: ${MEDIA_STORAGE_PROVIDER:-local}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      CLOUDINARY_UPLOAD_FOLDER: ${CLOUDINARY_UPLOAD_FOLDER:-tribe-trip}
+    command: >
+      sh -c "npm run db:push &&
+      if [ \"$$RUN_SEED\" = \"true\" ]; then npm run seed; fi &&
+      npm run start"
+    expose:
+      - "5000"
+    volumes:
+      - backend_data:/app/data
+      - backend_uploads:/app/backend/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5000/api/ready').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      TRIBE_TRIP_API_URL: ${TRIBE_TRIP_API_URL:-/api}
+    ports:
+      - "8080:8080"
+
+volumes:
+  backend_data:
+  backend_uploads:
