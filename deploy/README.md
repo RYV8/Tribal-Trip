@@ -132,9 +132,17 @@ SQLite is acceptable for the Docker preview. Before a real public launch, use a 
 Run before building or deploying:
 
 ```bash
-npm run quality
+npm run predeploy:staging
 git diff --check
 ```
+
+For a real market production launch, run:
+
+```bash
+npm run predeploy:production
+```
+
+That command intentionally fails while the project is still using SQLite, because production needs a managed database with backups. Staging can use SQLite for a controlled preview.
 
 The deployment is not ready if any of these fail:
 
@@ -142,4 +150,5 @@ The deployment is not ready if any of these fail:
 - `npm run build`
 - `npm run check:backend`
 - `npm run test:backend`
+- `node scripts/predeploy-check.js staging`
 - `/api/ready` returns non-200

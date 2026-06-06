@@ -81,6 +81,77 @@ cd TribeTrip
 
 After `cd TribeTrip`, your terminal should be inside the project folder.
 
+## Fast Team Setup
+
+Use this path when you already have access to the GitHub repository and you want to test the full frontend + backend experience.
+
+```bash
+npm ci
+npm --prefix backend ci
+
+cp .env.example .env.local
+cp backend/.env.example backend/.env
+
+npm run db:push
+npm run seed:backend
+npm run dev:editor
+npm run dev:admin
+npm run dev:super-admin
+```
+
+Then start the two services in two terminals from the repository root:
+
+```bash
+npm run dev:backend
+```
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:5173/
+```
+
+Backend health checks:
+
+```text
+http://localhost:5000/api/live
+http://localhost:5000/api/ready
+```
+
+If the frontend starts on another Vite port, use the URL printed by the terminal and add that URL to `FRONTEND_URLS` in `backend/.env` if CORS blocks requests.
+
+## Local Test Accounts
+
+These accounts are for local development and team testing only. Do not use these passwords in staging or production.
+
+| Role | Email | Password | What to test |
+| --- | --- | --- | --- |
+| Editor | `editor@tribetrip.local` | `EditorPass123` | Draft/review content, upload media, sources, review suggestions |
+| Admin | `admin@tribetrip.local` | `AdminPass123` | Publish/archive content, manage countries, culture guides, sources, users, audit logs |
+| Super admin | `superadmin@tribetrip.local` | `SuperAdminPass123` | Admin-level user management and full admin permissions |
+
+Create or reactivate them locally with:
+
+```bash
+npm run dev:editor
+npm run dev:admin
+npm run dev:super-admin
+```
+
+Normal users can be created from the Profile screen using the registration form.
+
+To open the editorial dashboard:
+
+1. Start backend and frontend.
+2. Open `http://localhost:5173/`.
+3. Go to `Profile`.
+4. Sign in with one of the accounts above.
+5. Click `Open editorial workspace`.
+
 ## Install The Project
 
 Run this command once after cloning the project to install the frontend:
@@ -139,6 +210,22 @@ DATABASE_URL="file:../dev.db"
 
 Image uploads use local storage by default. For production Cloudinary uploads, configure `MEDIA_STORAGE_PROVIDER=cloudinary` and the Cloudinary keys in `backend/.env`.
 
+Minimum local backend `.env` values:
+
+```bash
+PORT=5000
+NODE_ENV=development
+DATABASE_URL="file:../dev.db"
+JWT_SECRET=change_this_to_a_long_random_secret_string
+JWT_EXPIRES_IN=7d
+FRONTEND_URLS=http://localhost:5173,http://127.0.0.1:5173
+TRUST_PROXY=0
+LOG_REQUESTS=false
+MEDIA_STORAGE_PROVIDER=local
+```
+
+For team testing, keep SQLite. For real production, replace SQLite with a managed database and never reuse the local `JWT_SECRET`.
+
 Create or update the local database schema:
 
 ```bash
@@ -186,6 +273,12 @@ You can start from the frontend example file:
 
 ```bash
 cp .env.example .env.local
+```
+
+Root `.env.local` normally only needs:
+
+```bash
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ## How To Test The App Locally
@@ -254,6 +347,36 @@ http://localhost:8080/api/ready
 Use `deploy/docker.env.example` as the list of supported Docker environment variables. For hosted production, replace local SQLite with a managed database plan before real launch.
 The frontend container can change API targets at startup with `TRIBE_TRIP_API_URL` without rebuilding the React bundle. See `deploy/README.md` for the deployment checklist.
 
+Docker environment values to review before sharing a staging URL:
+
+```bash
+JWT_SECRET=replace_with_a_unique_32_plus_character_secret
+JWT_EXPIRES_IN=7d
+TRIBE_TRIP_API_URL=/api
+FRONTEND_URLS=https://your-staging-domain.com
+DATABASE_URL=file:../data/prod.db
+TRUST_PROXY=1
+LOG_REQUESTS=true
+RATE_LIMIT_WINDOW_MS=60000
+RATE_LIMIT_API_MAX=500
+RATE_LIMIT_AUTH_MAX=30
+RATE_LIMIT_LOCAL_SECRETS_MAX=60
+RUN_SEED=false
+MEDIA_STORAGE_PROVIDER=local
+```
+
+Use `RUN_SEED=true` only for the first staging preview with an empty database. After the database has content, switch it back to `false` so restarts do not reseed unexpectedly.
+
+For production media uploads, use Cloudinary or another durable media service instead of container-local uploads:
+
+```bash
+MEDIA_STORAGE_PROVIDER=cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_UPLOAD_FOLDER=tribe-trip
+```
+
 ## Editorial Workflow
 
 The editorial workspace is available from Profile after signing in with an editor or admin account.
@@ -262,6 +385,33 @@ The editorial workspace is available from Profile after signing in with an edito
 - Admins can publish, archive, manage countries, manage users, delete sources, and read audit logs.
 - Country coverage controls which countries appear as available in public discovery and the Africa map.
 - Published culture guides are loaded from the backend by the public Culture screen, with bundled local data kept as a guest/prototype fallback.
+
+Main admin sections:
+
+| Section | Purpose | Editor | Admin |
+| --- | --- | --- | --- |
+| Places | Museums, heritage sites, cultural centers | Draft/review | Publish/archive |
+| Stories | Civilizations, traditions, historical events | Draft/review | Publish/archive |
+| Artifacts | Objects, artworks, cultural significance | Draft/review | Publish/archive |
+| Countries | Country coverage and Africa map availability | No | Yes |
+| Culture Guides | Phrases, etiquette, taboos, food, music, clothing | Draft/review | Publish/archive |
+| Sources | Editorial citations for catalogue records | Add/update | Add/update/delete |
+| Suggestions | Local secrets submitted by users | Review | Publish/reject/archive |
+| Users | Account access and roles | No | Yes |
+| Audit | Admin/editorial activity log | No | Yes |
+
+Backend management commands from the repository root:
+
+```bash
+npm run db:push        # Apply Prisma schema to local SQLite
+npm run seed:backend   # Import bundled frontend content into the backend DB
+npm run dev:editor     # Create/reactivate local editor account
+npm run dev:admin      # Create/reactivate local admin account
+npm run dev:super-admin # Create/reactivate local super admin account
+npm run test:backend   # Run backend security/workflow tests
+```
+
+When content is updated in `src/data/content.js` or `src/data/cultureGuides.js`, run `npm run seed:backend` again for local/staging databases that should mirror bundled content.
 
 ## Useful Commands
 
@@ -272,6 +422,8 @@ npm run build        # Create the production build in the dist/ folder
 npm run preview      # Test the production build locally
 npm run lint         # Check the code for common issues
 npm run quality      # Run frontend lint/build and backend checks/tests
+npm run predeploy:staging    # Run quality checks plus staging deployment config checks
+npm run predeploy:production # Run production gate; fails until managed DB replaces SQLite
 npm run db:push        # Create/update the local Prisma DB
 npm run seed:backend   # Seed Prisma DB from frontend content
 npm run check:backend  # Check backend JavaScript syntax
@@ -301,6 +453,14 @@ Before opening a pull request, run the same local quality gate:
 ```bash
 npm run quality
 ```
+
+Before staging deployment, run:
+
+```bash
+npm run predeploy:staging
+```
+
+`npm run predeploy:production` is stricter and intentionally blocks while the Prisma datasource is still SQLite.
 
 For normal local testing, most team members only need:
 
@@ -374,6 +534,7 @@ Important assets include:
 - `public/logo-mark-dark.png`
 
 Some content images are loaded from external URLs inside `src/data/content.js`.
+The frontend normalizes unstable Wikimedia image URLs to `public/hero-grand-bassam.jpg` so Docker/staging demos do not break when external images fail to load. Replace the fallback with curated local assets before a polished public launch.
 
 ## Environment Variables
 
@@ -413,6 +574,41 @@ CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 CLOUDINARY_UPLOAD_FOLDER=tribe-trip
 ```
+
+## Deployment Readiness
+
+Use staging first. This project is ready for a controlled staging/demo deployment when this command passes:
+
+```bash
+npm run predeploy:staging
+```
+
+The staging gate checks frontend lint/build, backend syntax/schema/tests, Docker config, runtime frontend config, service worker API caching rules, and production guardrails.
+
+For a real public production launch, this command must pass:
+
+```bash
+npm run predeploy:production
+```
+
+It currently fails on purpose while Prisma uses SQLite. Before market production, complete these items:
+
+- Move from SQLite to a managed production database with backups.
+- Update `backend/prisma/schema.prisma` datasource provider and production `DATABASE_URL` together.
+- Set a unique production `JWT_SECRET` with at least 32 characters.
+- Set `FRONTEND_URLS` to the final HTTPS frontend domain.
+- Configure durable media storage, preferably Cloudinary for the current code path.
+- Add final domain, HTTPS, and deployment platform health checks.
+- Create real admin accounts after deploy; do not use the local test passwords in production.
+
+Suggested staging order:
+
+1. Run `npm run predeploy:staging` locally.
+2. Build and start Docker with `docker compose --env-file .env up --build`.
+3. Check `/api/ready` through the public frontend URL.
+4. Sign in as admin and verify the editorial dashboard.
+5. Create a normal user from Profile and verify saved items.
+6. Share the staging URL with the team.
 
 ## Before Sharing Code Changes
 

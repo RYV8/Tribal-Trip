@@ -11,6 +11,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "quality": "npm run lint && npm run build && npm run check:backend && npm run test:backend",
+    "predeploy:staging": "npm run quality && node scripts/predeploy-check.js staging",
+    "predeploy:production": "npm run quality && node scripts/predeploy-check.js production",
     "db:push": "npm --prefix backend run db:push",
     "seed:backend": "npm --prefix backend run seed",
     "check:backend": "npm --prefix backend run check",
