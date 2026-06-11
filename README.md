@@ -585,6 +585,19 @@ npm run predeploy:staging
 
 The staging gate checks frontend lint/build, backend syntax/schema/tests, Docker config, runtime frontend config, service worker API caching rules, and production guardrails.
 
+### Vercel Frontend Preview
+
+This repository includes `vercel.json` for deploying the Vite frontend from the repository root:
+
+```text
+Framework: Vite
+Install command: npm ci
+Build command: npm run build
+Output directory: dist
+```
+
+Set `VITE_API_URL` in Vercel when the frontend should call a hosted API, for example `https://api.example.com/api`. The Express/Prisma backend is not configured as a Vercel serverless app; deploy it with the Docker path or another Node hosting target unless it is migrated to serverless and a managed database.
+
 For a real public production launch, this command must pass:
 
 ```bash
