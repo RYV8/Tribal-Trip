@@ -585,18 +585,46 @@ npm run predeploy:staging
 
 The staging gate checks frontend lint/build, backend syntax/schema/tests, Docker config, runtime frontend config, service worker API caching rules, and production guardrails.
 
-### Vercel Frontend Preview
+### Vercel Full-Stack Preview
 
-This repository includes `vercel.json` for deploying the Vite frontend from the repository root:
+This repository includes `vercel.json` for deploying the Vite frontend and Express API from the repository root. Vercel serves the frontend from `dist` and routes `/api/*` to `api/[...path].js`, which loads the existing Express app.
 
 ```text
 Framework: Vite
-Install command: npm ci
-Build command: npm run build
+Install command: npm ci && npm --prefix backend ci
+Build command: npm run build:vercel
 Output directory: dist
 ```
 
-Set `VITE_API_URL` in Vercel when the frontend should call a hosted API, for example `https://api.example.com/api`. The Express/Prisma backend is not configured as a Vercel serverless app; deploy it with the Docker path or another Node hosting target unless it is migrated to serverless and a managed database.
+The Vercel backend path uses `backend/prisma/schema.vercel.prisma`, which is PostgreSQL-based. Connect Vercel Postgres or Neon and make sure the deployment has a PostgreSQL `DATABASE_URL` or `POSTGRES_PRISMA_URL`.
+
+Required Vercel environment variables:
+
+```bash
+NODE_ENV=production
+JWT_SECRET=replace_with_a_unique_32_plus_character_secret
+MEDIA_STORAGE_PROVIDER=cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_UPLOAD_FOLDER=tribe-trip
+```
+
+`VITE_API_URL` is optional for a single Vercel project because the production frontend defaults to same-origin `/api`. Set it only when the API is hosted on another origin.
+
+Before the first Vercel test deploy, create and seed the remote database from a shell that has the Vercel database URL available:
+
+```bash
+cd backend
+npm run db:push:vercel
+npm run seed:vercel
+```
+
+Run the Vercel readiness gate locally with:
+
+```bash
+npm run predeploy:vercel
+```
 
 For a real public production launch, this command must pass:
 

@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  code        String?  @unique
+  region      String?
+  description String?
+  imageUrl    String?
+  isAvailable Boolean  @default(true)
+  mapLat      Float?
+  mapLng      Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users         User[]
+  locations     Location[]
+  stories       Story[]
+  artifacts     Artifact[]
+  cultureGuide  CultureGuide?
+  localSecrets  LocalSecret[]
+}
+
+model User {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  email              String   @unique
+  passwordHash       String
+  role               String   @default("user")
+  isActive           Boolean  @default(true)
+  avatarUrl          String?
+  preferredCountryId Int?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  preferredCountry Country?      @relation(fields: [preferredCountryId], references: [id], onDelete: SetNull)
+  locations        Location[]
+  stories          Story[]
+  artifacts        Artifact[]
+  favorites        Favorite[]
+  localSecrets     LocalSecret[]
+  mediaAssets      MediaAsset[]
+  auditLogs        AuditLog[]
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  icon        String?
+  description String?
+  createdAt   DateTime @default(now())
+
+  locations Location[]
+}
+
+model Location {
+  id                   Int      @id @default(autoincrement())
+  countryId            Int
+  categoryId           Int?
+  name                 String
+  slug                 String   @unique
+  type                 String
+  city                 String?
+  summary              String?
+  history              String?
+  address              String?
+  openingHours         String?
+  contact              String?
+  latitude             Float?
+  longitude            Float?
+  imageUrl             String?
+  websiteUrl           String?
+  tags                 String   @default("[]")
+  relatedStorySlugs    String   @default("[]")
+  relatedArtifactSlugs String   @default("[]")
+  status               String   @default("published")
+  createdById          Int?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  country   Country   @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  category  Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdBy User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([countryId, status])
+}
+
+model Story {
+  id                   Int      @id @default(autoincrement())
+  countryId            Int?
+  title                String
+  slug                 String   @unique
+  category             String?
+  summary              String?
+  body                 String   @default("[]")
+  readTime             String?
+  imageUrl             String?
+  author               String?
+  relatedLocationSlugs String   @default("[]")
+  relatedArtifactSlugs String   @default("[]")
+  status               String   @default("published")
+  createdById          Int?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  country   Country?           @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  createdBy User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  keyPoints StoryKeyPoint[]
+  timeline  StoryTimeline[]
+
+  @@index([countryId, status])
+}
+
+model StoryKeyPoint {
+  id        Int    @id @default(autoincrement())
+  storyId   Int
+  point     String
+  sortOrder Int    @default(0)
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model StoryTimeline {
+  id        Int    @id @default(autoincrement())
+  storyId   Int
+  period    String
+  text      String
+  sortOrder Int    @default(0)
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+}
+
+model Artifact {
+  id                  Int      @id @default(autoincrement())
+  countryId           Int?
+  name                String
+  slug                String   @unique
+  origin              String?
+  period              String?
+  summary             String?
+  significance        String?
+  imageUrl            String?
+  relatedLocationSlug String?
+  relatedStorySlugs   String   @default("[]")
+  status              String   @default("published")
+  createdById         Int?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  country   Country? @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  createdBy User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([countryId, status])
+}
+
+model CultureGuide {
+  id        Int      @id @default(autoincrement())
+  countryId Int      @unique
+  languages String   @default("[]")
+  overview  String?
+  status    String   @default("published")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  phrases GuidePhrase[]
+  notes   GuideNote[]
+  foods   Food[]
+  foodSpots FoodSpot[]
+  styles  CultureStyle[]
+}
+
+model GuidePhrase {
+  id            Int    @id @default(autoincrement())
+  guideId       Int
+  language      String
+  english       String
+  localText     String
+  pronunciation String?
+  context       String?
+  status        String @default("draft")
+  sortOrder     Int    @default(0)
+
+  guide CultureGuide @relation(fields: [guideId], references: [id], onDelete: Cascade)
+}
+
+model GuideNote {
+  id        Int    @id @default(autoincrement())
+  guideId   Int
+  noteType  String
+  text      String
+  sortOrder Int    @default(0)
+
+  guide CultureGuide @relation(fields: [guideId], references: [id], onDelete: Cascade)
+}
+
+model Food {
+  id          Int    @id @default(autoincrement())
+  guideId     Int
+  name        String
+  description String?
+  commonIn    String @default("[]")
+  status      String @default("draft")
+  sortOrder   Int    @default(0)
+
+  guide CultureGuide @relation(fields: [guideId], references: [id], onDelete: Cascade)
+}
+
+model FoodSpot {
+  id         Int    @id @default(autoincrement())
+  guideId    Int
+  name       String
+  city       String?
+  specialty  String?
+  priceLevel String?
+  latitude   Float?
+  longitude  Float?
+  status     String @default("draft")
+  sortOrder  Int    @default(0)
+
+  guide CultureGuide @relation(fields: [guideId], references: [id], onDelete: Cascade)
+}
+
+model CultureStyle {
+  id          Int    @id @default(autoincrement())
+  guideId     Int
+  styleType   String
+  name        String
+  description String?
+  context     String?
+  status      String @default("draft")
+  sortOrder   Int    @default(0)
+
+  guide CultureGuide @relation(fields: [guideId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  itemType  String
+  itemId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemType, itemId])
+}
+
+model LocalSecret {
+  id           Int      @id @default(autoincrement())
+  userId       Int?
+  countryId    Int
+  type         String
+  title        String
+  city         String?
+  tip          String
+  helpfulCount Int      @default(0)
+  status       String   @default("submitted")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+}
+
+model MediaAsset {
+  id           Int      @id @default(autoincrement())
+  ownerId      Int?
+  url          String
+  publicId     String?
+  altText      String?
+  sourceCredit String?
+  mimeType     String?
+  createdAt    DateTime @default(now())
+
+  owner User? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+}
+
+model ContentSource {
+  id        Int      @id @default(autoincrement())
+  itemType  String
+  itemId    String
+  title     String
+  url       String?
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([itemType, itemId])
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  actorId     Int?
+  actorEmail  String?
+  actorRole   String?
+  action      String
+  entityType  String
+  entityId    String?
+  entityTitle String?
+  metadata    String   @default("{}")
+  createdAt   DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}

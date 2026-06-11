@@ -14,6 +14,13 @@ export default defineConfig([
     },
   },
   {
+    files: ['api/**/*.js'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
     files: ['src/**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,

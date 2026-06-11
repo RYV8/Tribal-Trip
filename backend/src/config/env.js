@@ -3,7 +3,8 @@ require('dotenv').config()
 const nodeEnv = process.env.NODE_ENV || 'development'
 const jwtSecret = process.env.JWT_SECRET || 'dev_only_change_this_secret'
 const mediaStorageProvider = process.env.MEDIA_STORAGE_PROVIDER || 'local'
-const databaseUrl = process.env.DATABASE_URL || (nodeEnv === 'production' ? '' : 'file:../dev.db')
+const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || (nodeEnv === 'production' ? '' : 'file:../dev.db')
+const isVercel = process.env.VERCEL === '1'
 
 if (nodeEnv === 'production' && (!jwtSecret || jwtSecret === 'dev_only_change_this_secret' || jwtSecret === 'change_this_to_a_long_random_secret_string' || jwtSecret.length < 32)) {
   throw new Error('JWT_SECRET must be set to a unique value with at least 32 characters in production')
@@ -21,6 +22,10 @@ if (mediaStorageProvider === 'cloudinary') {
   for (const key of ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET']) {
     if (!process.env[key]) throw new Error(`${key} must be set when MEDIA_STORAGE_PROVIDER=cloudinary`)
   }
+}
+
+if (isVercel && mediaStorageProvider === 'local') {
+  throw new Error('MEDIA_STORAGE_PROVIDER=cloudinary is required on Vercel because serverless file storage is ephemeral')
 }
 
 function parseList(value, fallback) {

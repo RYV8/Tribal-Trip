@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = 'http://localhost:5000/api'
+const DEFAULT_API_URL = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api'
 const REQUEST_TIMEOUT_MS = 2200
 const PUBLIC_CATALOG_CACHE_KEY = 'tribe-trip-public-catalog-cache'
 const CULTURE_GUIDES_CACHE_KEY = 'tribe-trip-culture-guides-cache'

@@ -1,8 +1,13 @@
 {
   "framework": "vite",
-  "installCommand": "npm ci",
-  "buildCommand": "npm run build",
+  "installCommand": "npm ci && npm --prefix backend ci",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
+  "functions": {
+    "api/[...path].js": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
