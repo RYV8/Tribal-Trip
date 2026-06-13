@@ -1,34 +1,28 @@
-import express from 'express'
-import path from 'path'
-import cors from 'cors'
-import helmet from 'helmet'
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
+const express = require('express')
+const path = require('path')
+const cors = require('cors')
+const helmet = require('helmet')
 
-import env from './config/env.js'
-import { testConnection } from './config/db.js'
-import { notFound, errorHandler } from './middleware/error.js'
-import { requestContext, requestLogger } from './middleware/observability.js'
-import { createRateLimit } from './middleware/rateLimit.js'
-
-// ES module workaround for __dirname
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const env = require('./config/env.js')
+const { testConnection } = require('./config/db.js')
+const { notFound, errorHandler } = require('./middleware/error.js')
+const { requestContext, requestLogger } = require('./middleware/observability.js')
+const { createRateLimit } = require('./middleware/rateLimit.js')
 
 // Route imports
-import authRoutes from './routes/auth.js'
-import profileRoutes from './routes/profile.js'
-import countriesRoutes from './routes/countries.js'
-import categoriesRoutes from './routes/categories.js'
-import locationsRoutes from './routes/locations.js'
-import storiesRoutes from './routes/stories.js'
-import artifactsRoutes from './routes/artifacts.js'
-import cultureGuidesRoutes from './routes/cultureGuides.js'
-import favoritesRoutes from './routes/favorites.js'
-import localSecretsRoutes from './routes/localSecrets.js'
-import mapRoutes from './routes/map.js'
-import searchRoutes from './routes/search.js'
-import adminRoutes from './routes/admin.js'
+const authRoutes = require('./routes/auth.js')
+const profileRoutes = require('./routes/profile.js')
+const countriesRoutes = require('./routes/countries.js')
+const categoriesRoutes = require('./routes/categories.js')
+const locationsRoutes = require('./routes/locations.js')
+const storiesRoutes = require('./routes/stories.js')
+const artifactsRoutes = require('./routes/artifacts.js')
+const cultureGuidesRoutes = require('./routes/cultureGuides.js')
+const favoritesRoutes = require('./routes/favorites.js')
+const localSecretsRoutes = require('./routes/localSecrets.js')
+const mapRoutes = require('./routes/map.js')
+const searchRoutes = require('./routes/search.js')
+const adminRoutes = require('./routes/admin.js')
 
 const app = express()
 
@@ -83,4 +77,4 @@ app.use('/api/admin', adminRoutes)
 app.use(notFound)
 app.use(errorHandler)
 
-export default app
+module.exports = app

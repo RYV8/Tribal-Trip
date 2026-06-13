@@ -1,8 +1,7 @@
 const env = require("./config/env");
+const app = require("./app.js");
 
 async function start() {
-  const { default: app } = await import("./app.js");
-
   app.listen(env.port, () => {
     console.log(`Tribe Trip API listening on http://localhost:${env.port}`);
     console.log(`Health check: http://localhost:${env.port}/api/health`);

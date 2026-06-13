@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
   try {
-    const { default: app } = await import('../backend/src/app.js');
+    const appModule = await import('../backend/src/app.js');
+    const app = appModule.default || appModule;
     await new Promise((resolve) => {
       res.on('finish', resolve);
       res.on('close', resolve);
