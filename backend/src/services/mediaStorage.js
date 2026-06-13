@@ -1,72 +1,35 @@
-const crypto = require('crypto')
-const fs = require('fs/promises')
-const path = require('path')
-const { v2: cloudinary } = require('cloudinary')
-const env = require('../config/env')
+const fs = require('fs')
 
-const uploadDir = path.join(__dirname, '..', '..', 'uploads')
+let uploader = null
+const hasCloudinary = process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET && process.env.CLOUDINARY_CLOUD_NAME
 
-function extensionFor(file) {
-  const extension = path.extname(file.originalname || '').toLowerCase()
-  if (extension) return extension
-  if (file.mimetype === 'image/jpeg') return '.jpg'
-  if (file.mimetype === 'image/png') return '.png'
-  if (file.mimetype === 'image/webp') return '.webp'
-  return '.jpg'
-}
-
-function randomPublicId(file) {
-  return `${Date.now()}-${crypto.randomBytes(8).toString('hex')}${extensionFor(file)}`
-}
-
-async function storeLocalImage(file, req) {
-  await fs.mkdir(uploadDir, { recursive: true })
-  const publicId = randomPublicId(file)
-  await fs.writeFile(path.join(uploadDir, publicId), file.buffer)
-
-  return {
-    provider: 'local',
-    publicId,
-    url: `${req.protocol}://${req.get('host')}/uploads/${publicId}`,
+if (hasCloudinary) {
+  try {
+    const cloudinary = require('cloudinary').v2
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    })
+    uploader = cloudinary.uploader
+  } catch (e) {
+    console.warn('Cloudinary init failed, falling back to local storage:', e && e.message)
   }
+} else {
+  console.warn('Cloudinary not configured — falling back to local storage/no-op uploader')
 }
 
-function uploadCloudinaryBuffer(file) {
-  cloudinary.config({
-    cloud_name: env.cloudinary.cloudName,
-    api_key: env.cloudinary.apiKey,
-    api_secret: env.cloudinary.apiSecret,
-    secure: true,
-  })
-
-  return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: env.cloudinary.folder,
-        resource_type: 'image',
-        overwrite: false,
-      },
-      (error, result) => {
-        if (error) return reject(error)
-        return resolve(result)
-      },
-    )
-    stream.end(file.buffer)
-  })
-}
-
-async function storeCloudinaryImage(file) {
-  const result = await uploadCloudinaryBuffer(file)
-  return {
-    provider: 'cloudinary',
-    publicId: result.public_id,
-    url: result.secure_url,
+async function uploadFile(filePath, options = {}) {
+  if (!uploader) {
+    if (fs.existsSync(filePath)) return { secure_url: null, public_id: null, localPath: filePath }
+    return { secure_url: null, public_id: null }
   }
+  return uploader.upload(filePath, options)
 }
 
-function storeUploadedImage(file, req) {
-  if (env.mediaStorageProvider === 'cloudinary') return storeCloudinaryImage(file)
-  return storeLocalImage(file, req)
+async function removeFile(publicId) {
+  if (!uploader) return { result: 'not-configured' }
+  return uploader.destroy(publicId)
 }
 
-module.exports = { storeUploadedImage }
+module.exports = { uploadFile, removeFile }
