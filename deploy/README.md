@@ -152,3 +152,34 @@ The deployment is not ready if any of these fail:
 - `npm run test:backend`
 - `node scripts/predeploy-check.js staging`
 - `/api/ready` returns non-200
+
+## Vercel Deployment
+
+This repository supports a single Vercel deployment that serves the React app and the Express API from the same origin.
+
+Use these settings in Vercel:
+
+```text
+Install Command: npm ci && npm --prefix backend ci
+Build Command: npm run build:vercel
+Output Directory: dist
+```
+
+Required environment variables:
+
+```text
+NODE_ENV=production
+DATABASE_URL=your_postgres_connection_string
+JWT_SECRET=replace_with_a_unique_32_plus_character_secret
+FRONTEND_URLS=https://your-vercel-domain.vercel.app
+MEDIA_STORAGE_PROVIDER=cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+Notes:
+
+- Keep `VITE_API_URL` empty for same-origin Vercel deployments so the frontend uses `/api`.
+- The API refuses to boot on Vercel unless Cloudinary is configured, because serverless file storage is ephemeral.
+- Use `backend/prisma/schema.vercel.prisma` for the deployed API schema and the local SQLite schema only for development.
