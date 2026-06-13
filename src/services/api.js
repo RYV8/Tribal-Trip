@@ -290,3 +290,15 @@ export function updateAdminLocalSecretStatus(token, id, status) {
 export function getConfiguredApiUrl() {
   return getApiBaseUrl()
 }
+
+// Helper: fetch and safely parse JSON, returning null on non-JSON responses
+export async function safeFetchJson(path, opts) {
+  const res = await fetch(path, opts);
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    console.warn('safeFetchJson: non-JSON response for', path, 'status', res.status);
+    return null;
+  }
+}
