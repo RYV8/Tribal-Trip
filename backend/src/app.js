@@ -62,3 +62,6 @@ app.use(notFound)
 app.use(errorHandler)
 
 module.exports = app
+
+// Export app for serverless adapters
+export default app
