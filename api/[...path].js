@@ -1,6 +1,9 @@
-import { createRequire } from 'node:module'
+import app from '../backend/src/app.js';
 
-const require = createRequire(import.meta.url)
-const app = require('../backend/src/app')
-
-export default app
+export default async function handler(req, res) {
+  await new Promise((resolve) => {
+    res.on('finish', resolve);
+    res.on('close', resolve);
+    app(req, res);
+  });
+}
