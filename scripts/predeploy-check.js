@@ -62,7 +62,8 @@ if (isVercel) {
   requireIncludes('vercel.json', 'npm --prefix backend ci', 'Vercel install must install backend dependencies for API functions.')
   requireIncludes('vercel.json', 'npm run build:vercel', 'Vercel build must generate the backend Prisma client before building the frontend.')
   requireIncludes('vercel.json', 'api/[...path].js', 'Vercel config must include the catch-all API function settings.')
-  requireIncludes('src/services/api.js', "import.meta.env.PROD ? '/api'", 'Production frontend must default to same-origin /api for a single Vercel deployment.')
+  requireIncludes('src/services/api.js', 'const DEFAULT_API_URL = import.meta.env.PROD', 'Production frontend must choose its default API URL by environment.')
+  requireIncludes('src/services/api.js', '"/api"', 'Production frontend must default to same-origin /api for a single Vercel deployment.')
   requireIncludes('backend/src/config/env.js', 'POSTGRES_PRISMA_URL', 'Backend must support Vercel Postgres environment variable names.')
   requireIncludes('backend/src/config/env.js', 'MEDIA_STORAGE_PROVIDER=cloudinary is required on Vercel', 'Backend must reject local media storage on Vercel.')
 }
