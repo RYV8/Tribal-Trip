@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "check": "find src scripts -name '*.js' -print0 | xargs -0 -n 1 node --check && prisma validate",
+    "check": "find src scripts -name '*.js' -print0 | xargs -0 -n 1 node --check && DATABASE_URL=file:../dev.db prisma validate",
     "check:vercel": "DATABASE_URL=${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-postgresql://tribe_trip:tribe_trip@localhost:5432/tribe_trip}}} prisma validate --schema prisma/schema.vercel.prisma",
     "test": "node scripts/run-tests.js",
     "db:generate": "prisma generate",

@@ -14,8 +14,8 @@ if (nodeEnv === 'production' && !databaseUrl) {
   throw new Error('DATABASE_URL must be set in production')
 }
 
-if (!['local', 'cloudinary'].includes(mediaStorageProvider)) {
-  throw new Error('MEDIA_STORAGE_PROVIDER must be local or cloudinary')
+if (!['local', 'cloudinary', 'supabase'].includes(mediaStorageProvider)) {
+  throw new Error('MEDIA_STORAGE_PROVIDER must be local, cloudinary, or supabase')
 }
 
 if (mediaStorageProvider === 'cloudinary') {
@@ -24,8 +24,14 @@ if (mediaStorageProvider === 'cloudinary') {
   }
 }
 
+if (mediaStorageProvider === 'supabase') {
+  for (const key of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_STORAGE_BUCKET']) {
+    if (!process.env[key]) throw new Error(`${key} must be set when MEDIA_STORAGE_PROVIDER=supabase`)
+  }
+}
+
 if (isVercel && mediaStorageProvider === 'local') {
-  throw new Error('MEDIA_STORAGE_PROVIDER=cloudinary is required on Vercel because serverless file storage is ephemeral')
+  throw new Error('MEDIA_STORAGE_PROVIDER=cloudinary or MEDIA_STORAGE_PROVIDER=supabase is required on Vercel because serverless file storage is ephemeral')
 }
 
 function parseList(value, fallback) {
@@ -75,6 +81,11 @@ const env = {
     apiKey: process.env.CLOUDINARY_API_KEY || '',
     apiSecret: process.env.CLOUDINARY_API_SECRET || '',
     folder: process.env.CLOUDINARY_UPLOAD_FOLDER || 'tribe-trip',
+  },
+  supabase: {
+    url: process.env.SUPABASE_URL || '',
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    storageBucket: process.env.SUPABASE_STORAGE_BUCKET || 'tribe-trip-media',
   },
 }
 

@@ -7,7 +7,7 @@ This folder documents the deploy path for the current React + Express + Prisma s
 Frontend environment:
 
 ```bash
-cp .env.example .env.local
+cp frontend-env/.env.example frontend-env/.env
 ```
 
 Default value:
@@ -181,5 +181,5 @@ CLOUDINARY_API_SECRET=your_api_secret
 Notes:
 
 - Keep `VITE_API_URL` empty for same-origin Vercel deployments so the frontend uses `/api`.
-- The API refuses to boot on Vercel unless Cloudinary is configured, because serverless file storage is ephemeral.
+- The API refuses to boot on Vercel unless Supabase Storage or Cloudinary is configured, because serverless file storage is ephemeral.
 - Use `backend/prisma/schema.vercel.prisma` for the deployed API schema and the local SQLite schema only for development.

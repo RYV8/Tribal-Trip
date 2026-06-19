@@ -35,6 +35,7 @@ function runOptional(command, args) {
 }
 
 requireFile('.env.example')
+requireFile('frontend-env/.env.example')
 requireFile('Dockerfile')
 requireFile('backend/Dockerfile')
 requireFile('docker-compose.yml')
@@ -62,10 +63,13 @@ if (isVercel) {
   requireIncludes('vercel.json', 'npm --prefix backend ci', 'Vercel install must install backend dependencies for API functions.')
   requireIncludes('vercel.json', 'npm run build:vercel', 'Vercel build must generate the backend Prisma client before building the frontend.')
   requireIncludes('vercel.json', 'api/[...path].js', 'Vercel config must include the catch-all API function settings.')
+  requireIncludes('vite.config.js', "envDir: './frontend-env'", 'Vite must not load backend secrets from the root .env file.')
   requireIncludes('src/services/api.js', 'const DEFAULT_API_URL = import.meta.env.PROD', 'Production frontend must choose its default API URL by environment.')
   requireIncludes('src/services/api.js', '"/api"', 'Production frontend must default to same-origin /api for a single Vercel deployment.')
   requireIncludes('backend/src/config/env.js', 'POSTGRES_PRISMA_URL', 'Backend must support Vercel Postgres environment variable names.')
-  requireIncludes('backend/src/config/env.js', 'MEDIA_STORAGE_PROVIDER=cloudinary is required on Vercel', 'Backend must reject local media storage on Vercel.')
+  requireIncludes('backend/src/config/env.js', 'MEDIA_STORAGE_PROVIDER=cloudinary or MEDIA_STORAGE_PROVIDER=supabase is required on Vercel', 'Backend must reject local media storage on Vercel.')
+  requireIncludes('backend/src/config/env.js', 'SUPABASE_SERVICE_ROLE_KEY', 'Backend must validate Supabase Storage credentials when MEDIA_STORAGE_PROVIDER=supabase.')
+  requireIncludes('backend/src/services/mediaStorage.js', 'provider: "supabase"', 'Media storage must support Supabase uploads for Vercel production.')
 }
 
 if (existsSync('backend/prisma/schema.prisma')) {

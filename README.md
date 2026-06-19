@@ -89,7 +89,7 @@ Use this path when you already have access to the GitHub repository and you want
 npm ci
 npm --prefix backend ci
 
-cp .env.example .env.local
+cp frontend-env/.env.example frontend-env/.env
 cp backend/.env.example backend/.env
 
 npm run db:push
@@ -208,7 +208,7 @@ Update `JWT_SECRET` if needed. The default local database URL is:
 DATABASE_URL="file:../dev.db"
 ```
 
-Image uploads use local storage by default. For production Cloudinary uploads, configure `MEDIA_STORAGE_PROVIDER=cloudinary` and the Cloudinary keys in `backend/.env`.
+Image uploads use local storage by default. For production uploads on Vercel, use Supabase Storage with `MEDIA_STORAGE_PROVIDER=supabase` and the Supabase storage keys in `backend/.env` or Vercel environment variables.
 
 Minimum local backend `.env` values:
 
@@ -263,7 +263,7 @@ http://localhost:5000/api/live   # process is running
 http://localhost:5000/api/ready  # process and database are ready
 ```
 
-To make the frontend use a different API URL, create a root `.env.local` file and set:
+To make the frontend use a different API URL, create `frontend-env/.env` and set:
 
 ```bash
 VITE_API_URL=http://localhost:5000/api
@@ -272,10 +272,10 @@ VITE_API_URL=http://localhost:5000/api
 You can start from the frontend example file:
 
 ```bash
-cp .env.example .env.local
+cp frontend-env/.env.example frontend-env/.env
 ```
 
-Root `.env.local` normally only needs:
+`frontend-env/.env` normally only needs:
 
 ```bash
 VITE_API_URL=http://localhost:5000/api
@@ -367,7 +367,16 @@ MEDIA_STORAGE_PROVIDER=local
 
 Use `RUN_SEED=true` only for the first staging preview with an empty database. After the database has content, switch it back to `false` so restarts do not reseed unexpectedly.
 
-For production media uploads, use Cloudinary or another durable media service instead of container-local uploads:
+For production media uploads, use Supabase Storage or Cloudinary instead of container-local uploads:
+
+```bash
+MEDIA_STORAGE_PROVIDER=supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_server_only_service_role_key
+SUPABASE_STORAGE_BUCKET=tribe-trip-media
+```
+
+Cloudinary is still supported:
 
 ```bash
 MEDIA_STORAGE_PROVIDER=cloudinary
@@ -538,7 +547,7 @@ The frontend normalizes unstable Wikimedia image URLs to `public/hero-grand-bass
 
 ## Environment Variables
 
-The frontend does not require environment variables to run with bundled data. Optional frontend variable:
+The frontend does not require environment variables to run with bundled data. Optional frontend variables belong in `frontend-env/.env`:
 
 ```bash
 VITE_API_URL=http://localhost:5000/api
@@ -565,7 +574,16 @@ RATE_LIMIT_LOCAL_SECRETS_MAX=60
 MEDIA_STORAGE_PROVIDER=local
 ```
 
-Production media uploads can use Cloudinary:
+Production media uploads can use Supabase Storage:
+
+```bash
+MEDIA_STORAGE_PROVIDER=supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_server_only_service_role_key
+SUPABASE_STORAGE_BUCKET=tribe-trip-media
+```
+
+Cloudinary is still supported:
 
 ```bash
 MEDIA_STORAGE_PROVIDER=cloudinary
@@ -603,11 +621,12 @@ Required Vercel environment variables:
 ```bash
 NODE_ENV=production
 JWT_SECRET=replace_with_a_unique_32_plus_character_secret
-MEDIA_STORAGE_PROVIDER=cloudinary
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-CLOUDINARY_UPLOAD_FOLDER=tribe-trip
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
+FRONTEND_URLS=https://your-vercel-domain.vercel.app
+MEDIA_STORAGE_PROVIDER=supabase
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_server_only_service_role_key
+SUPABASE_STORAGE_BUCKET=tribe-trip-media
 ```
 
 `VITE_API_URL` is optional for a single Vercel project because the production frontend defaults to same-origin `/api`. Set it only when the API is hosted on another origin.
@@ -638,7 +657,7 @@ It currently fails on purpose while Prisma uses SQLite. Before market production
 - Update `backend/prisma/schema.prisma` datasource provider and production `DATABASE_URL` together.
 - Set a unique production `JWT_SECRET` with at least 32 characters.
 - Set `FRONTEND_URLS` to the final HTTPS frontend domain.
-- Configure durable media storage, preferably Cloudinary for the current code path.
+- Configure durable media storage, preferably Supabase Storage when using Supabase Postgres.
 - Add final domain, HTTPS, and deployment platform health checks.
 - Create real admin accounts after deploy; do not use the local test passwords in production.
 
