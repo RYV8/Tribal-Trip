@@ -160,7 +160,7 @@ This repository supports a single Vercel deployment that serves the React app an
 Use these settings in Vercel:
 
 ```text
-Install Command: npm ci && npm --prefix backend ci
+Install Command: npm ci --include=dev && npm --prefix backend ci --include=dev
 Build Command: npm run build:vercel
 Output Directory: dist
 ```

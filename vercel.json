@@ -1,6 +1,6 @@
 {
   "framework": "vite",
-  "installCommand": "npm ci && npm --prefix backend ci",
+  "installCommand": "npm ci --include=dev && npm --prefix backend ci --include=dev",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "functions": {

@@ -60,7 +60,8 @@ requireIncludes('backend/src/config/env.js', 'JWT_SECRET must be set to a unique
 requireIncludes('backend/src/config/env.js', 'DATABASE_URL must be set in production', 'Backend must require DATABASE_URL in production.')
 
 if (isVercel) {
-  requireIncludes('vercel.json', 'npm --prefix backend ci', 'Vercel install must install backend dependencies for API functions.')
+  requireIncludes('vercel.json', 'npm ci --include=dev', 'Vercel install must include frontend dev dependencies such as Vite.')
+  requireIncludes('vercel.json', 'npm --prefix backend ci --include=dev', 'Vercel install must include backend dev dependencies such as Prisma CLI.')
   requireIncludes('vercel.json', 'npm run build:vercel', 'Vercel build must generate the backend Prisma client before building the frontend.')
   requireIncludes('vercel.json', 'api/[...path].js', 'Vercel config must include the catch-all API function settings.')
   requireIncludes('vite.config.js', "envDir: './frontend-env'", 'Vite must not load backend secrets from the root .env file.')

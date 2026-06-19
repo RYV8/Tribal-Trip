@@ -609,7 +609,7 @@ This repository includes `vercel.json` for deploying the Vite frontend and Expre
 
 ```text
 Framework: Vite
-Install command: npm ci && npm --prefix backend ci
+Install command: npm ci --include=dev && npm --prefix backend ci --include=dev
 Build command: npm run build:vercel
 Output directory: dist
 ```
