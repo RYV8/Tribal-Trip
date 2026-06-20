@@ -1,5 +1,3 @@
-const localHeritageImage = '/hero-grand-bassam.jpg'
-
 const image = {
   abomey:
     'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Abomey_2006_1.jpg/1280px-Abomey_2006_1.jpg',
@@ -87,10 +85,6 @@ const image = {
     'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Nkisi_nkondi-71.1892.70.4-DSC00382-black.jpg/1280px-Nkisi_nkondi-71.1892.70.4-DSC00382-black.jpg',
   bagaNimba:
     'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Shoulder_mask_nimba_Louvre_MHNT-ETH-AF127.jpg/1280px-Shoulder_mask_nimba_Louvre_MHNT-ETH-AF127.jpg',
-}
-
-for (const key of Object.keys(image)) {
-  if (image[key].startsWith('http')) image[key] = localHeritageImage
 }
 
 export const locations = [

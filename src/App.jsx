@@ -234,7 +234,7 @@ const stableImageFallback = '/hero-grand-bassam.jpg'
 
 function normalizeImageUrl(image) {
   if (!image) return stableImageFallback
-  return String(image).includes('upload.wikimedia.org') ? stableImageFallback : image
+  return image
 }
 
 function normalizeCatalogItems(items = []) {

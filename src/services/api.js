@@ -2,7 +2,7 @@ const DEFAULT_API_URL = import.meta.env.PROD
   ? "/api"
   : "http://localhost:5000/api";
 const REQUEST_TIMEOUT_MS = 2200;
-const PUBLIC_CATALOG_CACHE_KEY = "tribe-trip-public-catalog-cache";
+const PUBLIC_CATALOG_CACHE_KEY = "tribe-trip-public-catalog-cache-v2";
 const CULTURE_GUIDES_CACHE_KEY = "tribe-trip-culture-guides-cache";
 
 export class ApiError extends Error {
@@ -109,13 +109,14 @@ function writeCachedJson(key, value) {
 }
 
 export async function loadPublicCatalog() {
+  const catalogRequestOptions = { timeoutMs: 6000 };
   const [countries, categories, locations, stories, artifacts] =
     await Promise.all([
-      fetchJson("/countries"),
-      fetchJson("/categories"),
-      fetchJson("/locations"),
-      fetchJson("/stories"),
-      fetchJson("/artifacts"),
+      fetchJson("/countries", catalogRequestOptions),
+      fetchJson("/categories", catalogRequestOptions),
+      fetchJson("/locations", catalogRequestOptions),
+      fetchJson("/stories", catalogRequestOptions),
+      fetchJson("/artifacts", catalogRequestOptions),
     ]);
 
   const catalog = {
