@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tribe-trip-cache-v3'
+const CACHE_NAME = 'tribe-trip-cache-v4'
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -35,7 +35,6 @@ self.addEventListener('fetch', (event) => {
     requestUrl.origin === self.location.origin &&
     (requestUrl.pathname === '/runtime-config.js' || requestUrl.pathname.startsWith('/api/') || requestUrl.pathname.startsWith('/uploads/'))
   ) {
-    event.respondWith(fetch(request))
     return
   }
 

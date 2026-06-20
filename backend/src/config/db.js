@@ -34,6 +34,7 @@ const prisma = createPrismaClient()
 
 async function testConnection() {
   await prisma.$queryRaw`SELECT 1`
+  await prisma.country.count()
   return true
 }
 
