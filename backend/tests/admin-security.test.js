@@ -208,6 +208,61 @@ test("request validation rejects malformed write payloads", async () => {
   assert.equal(invalidStatus.payload.message, "Invalid request payload");
 });
 
+test("frontend auth flow can register, login, and load account data", async () => {
+  const origin = "http://localhost:5173";
+  const preflight = await request("/api/auth/login", {
+    method: "OPTIONS",
+    headers: {
+      Origin: origin,
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "content-type",
+    },
+  });
+  assert.equal(preflight.status, 204);
+  assert.equal(preflight.headers.get("access-control-allow-origin"), origin);
+
+  const registered = await request("/api/auth/register", {
+    method: "POST",
+    headers: { Origin: origin },
+    body: {
+      name: "Frontend Auth Tester",
+      email: "Frontend.Auth@Test.Local",
+      password: "FrontendPass123",
+    },
+  });
+  assert.equal(registered.status, 201);
+  assert.equal(registered.headers.get("access-control-allow-origin"), origin);
+  assert.equal(registered.payload.data.user.email, "frontend.auth@test.local");
+  assert.equal(registered.payload.data.user.role, "user");
+  assert.ok(registered.payload.data.token);
+
+  const loggedIn = await request("/api/auth/login", {
+    method: "POST",
+    headers: { Origin: origin },
+    body: {
+      email: "frontend.auth@test.local",
+      password: "FrontendPass123",
+    },
+  });
+  assert.equal(loggedIn.status, 200);
+  assert.equal(loggedIn.payload.data.user.email, "frontend.auth@test.local");
+  assert.ok(loggedIn.payload.data.token);
+
+  const profile = await request("/api/profile", {
+    headers: { Origin: origin },
+    token: loggedIn.payload.data.token,
+  });
+  assert.equal(profile.status, 200);
+  assert.equal(profile.payload.data.email, "frontend.auth@test.local");
+
+  const favorites = await request("/api/favorites", {
+    headers: { Origin: origin },
+    token: loggedIn.payload.data.token,
+  });
+  assert.equal(favorites.status, 200);
+  assert.deepEqual(favorites.payload.data, []);
+});
+
 test("admin routes require an editorial role", async () => {
   const noToken = await request("/api/admin/locations");
   assert.equal(noToken.status, 401);
