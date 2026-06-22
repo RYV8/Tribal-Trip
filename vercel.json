@@ -6,6 +6,12 @@
   "functions": {
     "api/[...path].js": {
       "maxDuration": 10
+    },
+    "api/auth/[...path].js": {
+      "maxDuration": 10
+    },
+    "api/admin/[...path].js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
