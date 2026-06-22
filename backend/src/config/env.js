@@ -1,3 +1,5 @@
+const crypto = require('node:crypto')
+
 require('dotenv').config()
 
 const nodeEnv = process.env.NODE_ENV || 'development'
@@ -77,6 +79,45 @@ function parseTrustProxy(value) {
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : value
 }
 
+function maskValue(value) {
+  if (!value) return ''
+  if (value.length <= 8) return value
+  return `${value.slice(0, 4)}...${value.slice(-4)}`
+}
+
+function describeDatabaseUrl(value) {
+  if (!value) return null
+
+  try {
+    const parsed = new URL(value)
+    const databaseName = parsed.pathname.replace(/^\/+/, '') || null
+    const schema = parsed.searchParams.get('schema') || 'public'
+    const safeFingerprintInput = [
+      parsed.protocol,
+      parsed.username,
+      parsed.hostname,
+      parsed.port,
+      databaseName,
+      schema,
+    ].join('|')
+
+    return {
+      protocol: parsed.protocol.replace(/:$/, ''),
+      host: parsed.hostname,
+      port: parsed.port || (parsed.protocol === 'postgresql:' || parsed.protocol === 'postgres:' ? '5432' : ''),
+      database: databaseName,
+      schema,
+      username: maskValue(decodeURIComponent(parsed.username || '')),
+      connectionLimit: parsed.searchParams.get('connection_limit') || null,
+      poolTimeout: parsed.searchParams.get('pool_timeout') || null,
+      sslmode: parsed.searchParams.get('sslmode') || null,
+      fingerprint: crypto.createHash('sha256').update(safeFingerprintInput).digest('hex').slice(0, 12),
+    }
+  } catch {
+    return { parseError: true }
+  }
+}
+
 const env = {
   port: Number(process.env.PORT) || 5000,
   nodeEnv,
@@ -85,6 +126,7 @@ const env = {
   jwtSecret,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   databaseUrl,
+  databaseTarget: describeDatabaseUrl(databaseUrl),
   logRequests: parseBoolean(process.env.LOG_REQUESTS, nodeEnv === 'production'),
   rateLimits: {
     windowMs: parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60_000),

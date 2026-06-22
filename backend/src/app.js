@@ -53,10 +53,29 @@ app.get('/api/live', (req, res) => {
 
 app.get(['/api/health', '/api/ready'], async (req, res) => {
   try {
-    await testConnection()
-    res.json({ success: true, service: 'Tribe Trip API', status: 'ready', database: 'ready', env: env.nodeEnv, requestId: req.requestId })
+    const diagnostics = await testConnection()
+    res.json({
+      success: true,
+      service: 'Tribe Trip API',
+      status: 'ready',
+      database: 'ready',
+      env: env.nodeEnv,
+      databaseTarget: env.databaseTarget,
+      databaseRuntime: diagnostics.runtime,
+      counts: diagnostics.counts,
+      requestId: req.requestId,
+    })
   } catch (err) {
-    res.status(503).json({ success: false, service: 'Tribe Trip API', status: 'not_ready', database: 'unavailable', message: err.message, requestId: req.requestId })
+    res.status(503).json({
+      success: false,
+      service: 'Tribe Trip API',
+      status: 'not_ready',
+      database: 'unavailable',
+      env: env.nodeEnv,
+      databaseTarget: env.databaseTarget,
+      message: err.message,
+      requestId: req.requestId,
+    })
   }
 })
 

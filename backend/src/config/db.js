@@ -33,9 +33,19 @@ function createPrismaClient() {
 const prisma = createPrismaClient()
 
 async function testConnection() {
-  await prisma.$queryRaw`SELECT 1`
-  await prisma.country.count()
-  return true
+  let runtime = { database: isSqliteUrl(env.databaseUrl) ? 'sqlite' : null }
+  if (!isSqliteUrl(env.databaseUrl)) {
+    ;[runtime] = await prisma.$queryRaw`
+      SELECT
+        current_database() AS database,
+        current_schema() AS schema,
+        current_user AS username,
+        inet_server_addr()::text AS host,
+        inet_server_port() AS port
+    `
+  }
+  const countryCount = await prisma.country.count()
+  return { runtime, counts: { countries: countryCount } }
 }
 
 module.exports = { prisma, testConnection }
