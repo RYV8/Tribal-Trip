@@ -1470,6 +1470,10 @@ h3 {
   padding: 20px;
 }
 
+.account-panel {
+  min-height: 340px;
+}
+
 .panel-heading {
   display: flex;
   align-items: center;

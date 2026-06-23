@@ -979,6 +979,7 @@ function App() {
   }
 
   const submitAuth = async (mode, payload) => {
+    const scrollY = typeof window === 'undefined' ? 0 : window.scrollY
     setAuthStatus('loading')
     setAuthMessage('')
     try {
@@ -988,6 +989,9 @@ function App() {
       setAuthStatus('authenticated')
       setAuthMessage(mode === 'register' ? 'Account created.' : 'Signed in.')
       await hydrateRemoteFavorites(result.token, favorites)
+      if (typeof window !== 'undefined') {
+        window.requestAnimationFrame(() => window.scrollTo(0, scrollY))
+      }
     } catch (err) {
       setAuthStatus('guest')
       setAuthMessage(err.message || 'Authentication failed.')
@@ -2258,7 +2262,28 @@ function SearchScreen({ locations, stories, artifacts, countries, categories, qu
     ],
     [artifacts, locations, stories],
   )
-  const searchableByKey = useMemo(() => new Map(searchable.map((item) => [`${item.kind}:${item.id}`, item])), [searchable])
+  const searchableByKey = useMemo(() => new globalThis.Map(searchable.map((item) => [`${item.kind}:${item.id}`, item])), [searchable])
+
+  const normalizeRemoteResult = useCallback((item) => {
+    const kind = item.kind || item.type
+    const id = item.id
+    const localItem = searchableByKey.get(`${kind}:${id}`)
+    if (localItem) return localItem
+
+    return {
+      id,
+      kind,
+      title: item.title || item.name || id,
+      name: item.title || item.name || id,
+      country: item.country || '',
+      image: normalizeImageUrl(item.image),
+      summary: item.description || item.summary || '',
+      subtitle: item.country || item.description || kind,
+      type: kind === 'location' ? 'Place' : undefined,
+      category: kind === 'story' ? 'Story' : undefined,
+      origin: kind === 'artifact' ? item.country : undefined,
+    }
+  }, [searchableByKey])
 
   useEffect(() => {
     const searchText = query.trim()
@@ -2275,7 +2300,7 @@ function SearchScreen({ locations, stories, artifacts, countries, categories, qu
             ...(payload.locations ?? []),
             ...(payload.stories ?? []),
             ...(payload.artifacts ?? []),
-          ].map((item) => ({ kind: item.type, id: item.id }))
+          ].map(normalizeRemoteResult).filter((item) => item.kind && item.id)
           setRemoteSearchState({ source: 'api', query: searchText, items, message: `${payload.total ?? items.length} backend result${(payload.total ?? items.length) === 1 ? '' : 's'}.` })
         })
         .catch((err) => {
@@ -2288,7 +2313,7 @@ function SearchScreen({ locations, stories, artifacts, countries, categories, qu
       cancelled = true
       window.clearTimeout(timer)
     }
-  }, [query])
+  }, [normalizeRemoteResult, query])
 
   const localMatches = (normalized
     ? searchable.filter((item) =>
@@ -2309,7 +2334,7 @@ function SearchScreen({ locations, stories, artifacts, countries, categories, qu
   )
   const searchText = query.trim()
   const hasActiveRemoteSearch = remoteSearchState.query === searchText
-  const remoteMatches = hasActiveRemoteSearch ? remoteSearchState.items.map((item) => searchableByKey.get(`${item.kind}:${item.id}`)).filter(Boolean) : []
+  const remoteMatches = hasActiveRemoteSearch ? remoteSearchState.items : []
   const baseResults = normalized && hasActiveRemoteSearch && remoteSearchState.source === 'api' ? remoteMatches : localMatches
 
   const results = baseResults
@@ -2362,7 +2387,7 @@ function SearchScreen({ locations, stories, artifacts, countries, categories, qu
         {results.map((item) => (
           <article className="search-result" key={`${item.kind}-${item.id}`}>
             <img src={item.image} alt="" />
-            <button type="button" onClick={() => openScreen(`${item.kind}Detail`, item)}>
+            <button type="button" onClick={() => openScreen(`${item.kind}Detail`, searchableByKey.get(`${item.kind}:${item.id}`) || item)}>
               <span>{item.kind}</span>
               <strong>{item.title}</strong>
               <small>{item.subtitle}</small>
@@ -2665,6 +2690,7 @@ function AuthPanel({ authStatus, authMessage, submitAuth }) {
 
   const submit = (event) => {
     event.preventDefault()
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     submitAuth(mode, isRegister ? form : { email: form.email, password: form.password })
   }
 
