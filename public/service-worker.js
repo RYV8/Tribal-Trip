@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tribe-trip-cache-v4'
+const CACHE_NAME = 'tribe-trip-cache-v5'
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -17,6 +17,10 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => Promise.allSettled(APP_SHELL.map((url) => cache.add(url)))),
   )
   self.skipWaiting()
+})
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
