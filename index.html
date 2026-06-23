@@ -31,7 +31,12 @@
     <script>
       if ('serviceWorker' in navigator) {
         let serviceWorkerRefreshPending = false
+        let serviceWorkerHadController = Boolean(navigator.serviceWorker.controller)
         navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!serviceWorkerHadController) {
+            serviceWorkerHadController = true
+            return
+          }
           if (serviceWorkerRefreshPending) return
           serviceWorkerRefreshPending = true
           window.location.reload()
